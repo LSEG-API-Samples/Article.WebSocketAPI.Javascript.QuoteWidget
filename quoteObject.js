@@ -371,7 +371,7 @@
             
             // Request becomes valid when we get a valid response
             self.validRequest = false;
-            self.widget.Name = ""
+            self.error = "";
 
             // Submit to server
             this.send(JSON.stringify(marketPrice));           
