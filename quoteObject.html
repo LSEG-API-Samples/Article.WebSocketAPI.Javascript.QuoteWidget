@@ -1,0 +1,225 @@
+<html ng-app="QuoteWidget">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"/>
+    <title>Quote Widget</title>
+    <meta name="author" content="Nick Zincone"></>
+
+    <!-- Publicly available styles -->
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+
+    <!-- Publicly available Javascript libraries -->
+    <script type="text/javascript" src="js/angular.min.js"></script>
+    <script type="text/javascript" src="js/angular-animate.min.js"></script>
+
+    <!-- Application-specific javascript interface and logic -->
+    <script type="text/javascript" src="QuoteObject.js"></script>
+
+    <style>
+        /* Some convenient color class used in our display */
+        .wlabel {
+            color: #66ffff;
+            text-align: right;
+        }
+        .color-green {
+            color: lime;
+        }        
+        .color-red {
+          color: #ff3333;
+        }        
+        .color-orange {
+          color: orange;
+        }        
+        
+        .vertical-align {
+            display: flex;
+            align-items: center;
+        }
+
+        input{margin-top:15px; height:25px;}
+
+        /* Animation 
+           Coupled with the animate-on-change directive within our Javascript, define how the highlight is displayed upon change */
+
+        [animate-on-change] {
+          transition: all 1s;
+          -webkit-transition: all 1s;
+        }
+        [animate-on-change].changed {
+          transition: none;
+          -webkit-transition: none;
+        } 
+        
+        /* Our market data items will hilite in the specified color */
+        .change.ng-enter {
+            color: yellow;
+        }
+
+        /* Our status bar messages will hilite in the specified color */
+        .status.ng-enter {
+            color: orange;
+        } 
+
+        /* Some visual feedback when were in our input RIC field */
+        .ng-invalid.ng-dirty {
+            border-color: #FA787E;
+        }        
+        .ng-valid.ng-dirty {
+            border-color: #78FA89;
+        }
+        
+        /* 10px gutter
+             Our Bootstrap grid uses a default spacing between columns of 15px on either side.  Referred to as the gutter,
+             we can override that default here. */
+        .gutter-10.row {
+            margin-right: -5px;
+            margin-left: -5px;
+        }        
+        .gutter-10 > [class^="col-"], .gutter-10 > [class^=" col-"] {
+            padding-right: 5px;
+            padding-left: 5px;
+        }
+    </style>
+
+</head>
+
+<body ng-controller="widgetController as quote">
+    <div class="page-header">
+        <h3>Elektron Websocket API - Quote Widget</h3>
+    </div>
+ 
+    <div class="container" style="width:800px;height:200px; font-size:12px; color:white;background:#303030; border:2px solid orange;">
+        <div>
+            <div class="row vertical-align" style="background:#202020;height: 50px;">
+                <div class="col-md-3" style="font-size:24px">Equity Quote</div>
+                <div class="col-md-2">
+                    <form ng-submit="quote.requestItem()">
+                        <input ng-disabled="quote.needsConfiguration" type="text" value={{quote.requestedRic}} ng-model="quote.requestedRic" 
+                               size="12" style="color:white;background:black" required>
+                        </input>
+                    </form>
+                </div>
+                <div class="col-md-8" style="font-size:14px;">
+                    <div ng-show=quote.validRequest>
+                        <span title="DSPLY_NAME" class="color-orange">{{quote.widget.DSPLY_NAME}}</span>
+                        <span title="RDN_EXCHD2">&nbsp;({{quote.widget.RDN_EXCHD2}}</span>
+                        <span>:</span>
+                        <span title="PROV_SYMB">{{quote.widget.PROV_SYMB}})</span>
+                    </div>
+                    <span ng-show=!quote.validRequest class="color-red">{{quote.error}}</span>
+                </div>
+            </div>
+            
+            <div ng-show=quote.needsConfiguration>
+                Before using this widget, the following configuration is required within the 'quoteObject.js' file.
+                Modify the following section:
+                <pre style="color:yellow;background-color:#303030; border:none">
+   app.constant('config', {
+      wsServer: '&lt;host:port&gt;',    // Address of our Eikon WebSocket server.  Format: &lt;ip&gt;:&lt;port&gt;
+      ...</pre>
+                
+                Provide your WebSocket host and port.  Eg:  'ads3:15000'.  Then reload this page.
+            </div>
+            
+            <div ng-show=quote.validRequest>
+                <div class="row vertical-align gutter-10">
+                    <div class="col-md-4" style="color:orange">
+                        <span title="CURRENCY">{{quote.widget.CURRENCY}}</span>
+                        <span style="font-size:16px" ng-class="{'color-red': quote.widget.PriceTick === 254, 'color-green': quote.widget.PriceTick === 222}">
+                            {{quote.widget.PriceTick === 254 ? '&#x25BC;' : (quote.widget.PriceTick === 222 ? '&#x25B2;' : ' ')}}
+                        </span>
+                        <span title="TRDPRC_1" class="change" animate-on-change="quote.widget.TRDPRC_1" style="font-size:20px;">{{quote.widget.TRDPRC_1 | number:3}}</span>
+                        <span ng-class="{'color-red': quote.widget.NETCHNG_1 < 0, 'color-green': quote.widget.NETCHNG_1 > 0}">
+                            <span class="change" style="font-size:14px" animate-on-change="quote.widget.TRDPRC_1">
+                                <span title="NETCHNG_1">{{quote.widget.NETCHNG_1 > 0 ? '+' : ''}}{{quote.widget.NETCHNG_1 | number:3}}</span>
+                                <span title="PCTCHNG">({{quote.widget.PCTCHNG | number:3}}%)</span>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="col-md-8" style="font-size:14px">
+                        <span title="TRDTIM_1">{{quote.widget.TRDTIM_1 | substr:0:8}}</span>
+                        <span class="wlabel"> - </span>
+                        <span title="TRADE_DATE">{{quote.widget.TRADE_DATE | trDate}}</span>
+                    </div>
+                </div>
+                
+                <div class="row gutter-10">
+                    <div title="TRDPRC_2" class="col-md-1 change" animate-on-change="quote.widget.TRDPRC_2">{{quote.widget.TRDPRC_2 | number:3}}</div>
+                    <div class="col-md-1 wlabel">Volume</div>
+                    <div title="TRDVOL_1" class="col-md-1 change" animate-on-change="quote.widget.TRDVOL_1">{{quote.widget.TRDVOL_1}}</div>
+                    <div class="col-md-2 wlabel">Acc. Volume</div>
+                    <div title="ACVOL_1" class="col-md-2 change" animate-on-change="quote.widget.ACVOL_1">{{quote.widget.ACVOL_1}}</div>  
+                    <div class="col-md-1 wlabel">VWAP</div>
+                    <div title="VWAP" class="col-md-1 change" animate-on-change="quote.widget.VWAP">{{quote.widget.VWAP | number:3}}</div>                      
+                </div>
+                <div class="row gutter-10">
+                    <div title="TRDPRC_3" class="col-md-1 change" animate-on-change="quote.widget.TRDPRC_3">{{quote.widget.TRDPRC_3 | number:3}}</div>
+                    <div class="col-md-1 wlabel">Open</div>
+                    <div title="OPEN_PRC" class="col-md-1">{{quote.widget.OPEN_PRC | number:3}}</div>
+                    <div class="col-md-2 wlabel">Today's Low</div>
+                    <div title="LOW_1" class="col-md-2 change" animate-on-change="quote.widget.LOW_1">{{quote.widget.LOW_1 | number:3}}</div>
+                    <div class="col-md-1 wlabel">Prev Cls</div>
+                    <div class="col-md-2">
+                        <span title="HST_CLOSE">{{quote.widget.HST_CLOSE | number:3}}</span>
+                        <span class="wlabel"> - </span>                        
+                        <span title="HSTCLSDATE">{{quote.widget.HSTCLSDATE | trDate}}</span>
+                    </div>                      
+                </div>
+                <div class="row gutter-10">
+                    <div title="TRDPRC_4" class="col-md-1 change" animate-on-change="quote.widget.TRDPRC_4">{{quote.widget.TRDPRC_4 | number:3}}</div> 
+                    <div class="col-md-1 wlabel">Bid</div>
+                    <div title="BID" class="col-md-1 change" animate-on-change="quote.widget.BIDSIZE">{{quote.widget.BID | number:3}}</div> 
+                    <div class="col-md-2 wlabel">Today's High</div>
+                    <div title="HIGH_1" class="col-md-2 change" animate-on-change="quote.widget.HIGH_1">{{quote.widget.HIGH_1 | number:3}}</div>
+                    <div class="col-md-1 wlabel">Div/Yield</div>
+                    <div title="YIELD" class="col-md-2">
+                        <span title="DIVIDEND">{{quote.widget.DIVIDEND | number:3}}</span>
+                        <span class="wlabel">/</span>
+                        <span title="YIELD">{{quote.widget.YIELD}}</span>
+                    </div>                     
+                </div>
+                <div class="row gutter-10">
+                    <div title="TRDPRC_5" class="col-md-1 change" animate-on-change="quote.widget.TRDPRC_5">{{quote.widget.TRDPRC_5 | number:3}}</div> 
+                    <div class="col-md-1 wlabel">Ask</div>
+                    <div title="ASK" class="col-md-1 change" animate-on-change="quote.widget.ASKSIZE">{{quote.widget.ASK | number:3}}</div>
+                    <div class="col-md-2 wlabel">52 Week Range</div>
+                    <div class="col-md-2 change">
+                        <span title="YRLOW" animate-on-change="quote.widget.YRLOW">{{quote.widget.YRLOW | number:2}}</span>
+                        <span class="wlabel"> - </span>
+                        <span title="YRHIGH" animate-on-change="quote.widget.YRHIGH">{{quote.widget.YRHIGH | number:2}}</span>
+                    </div> 
+                    <div class="col-md-1 wlabel">EPS</div>
+                    <div title="EARNINGS" class="col-md-2">{{quote.widget.EARNINGS | number:3}}</div>                       
+                </div>
+                <div class="row gutter-10">
+                    <div class="col-md-1"></div> 
+                    <div class="col-md-1 wlabel">Size</div>
+                    <div class="col-md-1">
+                        <span title="BIDSIZE" class="change" animate-on-change="quote.widget.BIDSIZE">{{quote.widget.BIDSIZE}}</span>
+                        <span class="wlabel">x</span>
+                        <span title="ASKSIZE" class="change" animate-on-change="quote.widget.BIDSIZE">{{quote.widget.ASKSIZE}}</span>
+                    </div> 
+                    <div class="col-md-2 wlabel"></div>
+                    <div class="col-md-2 change">
+                        <span title="YRLOWDAT" animate-on-change="quote.widget.yearLowDate">{{quote.widget.YRLOWDAT | trDate}}</span>
+                        <span class="wlabel"> - </span>
+                        <span title="YRHIGHDAT" animate-on-change="quote.widget.yearHighDate">{{quote.widget.YRHIGHDAT | trDate}}</span>
+                    </div>  
+                    <div class="col-md-1 wlabel">P/E</div>
+                    <div title="PERATIO" class="col-md-2">{{quote.widget.PERATIO | number:3}}</div>                         
+                </div>                
+            </div>
+        </div>        
+    </div>
+    
+    <div class="container" style="width:800px; color:white;background:#303030;">
+        <div class="row gutter-10">
+            <div class="col-md-1 wlabel">Status: </div>    
+            <div class="col-md-11" style="color:yellow;">
+                <select class="status" animate-on-change="statusList[0]" style="width:100%; background-color:black" onchange="this.selectedIndex = 0;" 
+                        ng-model="statusList[0]" ng-options="status.msg for status in statusList"></select>
+            </div>
+        </div>
+    </div>  
+
+</body>
+</html>
