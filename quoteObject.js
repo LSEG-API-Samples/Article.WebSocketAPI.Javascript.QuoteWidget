@@ -118,7 +118,7 @@
         this.needsConfiguration = (config.wsServer === '<host:port>');
         
         this.connect = function ()
-        {       
+        {        
             widgetStatus.update("Connecting to the WebSocket service on [host:port] " + config.wsServer + "...");
             
              // Connect into our WebSocket server
@@ -174,7 +174,8 @@
                             self.processLogin(msg);
                         } else if ( msg.Type === "Status" ) {
                             // Report potential issues with our requested market data item
-                            self.error = msg.Key.Name + ":" + msg.State.Text;
+                            self.error = (msg.Key ? msg.Key.Name+":" : "");
+                            self.error += msg.State.Text;
                             widgetStatus.update("Status response for item: " + self.error);
                         }
                        else {

@@ -44,10 +44,6 @@
           transition: all 1s;
           -webkit-transition: all 1s;
         }
-        [animate-on-change].changed {
-          transition: none;
-          -webkit-transition: none;
-        } 
         
         /* Our market data items will hilite in the specified color */
         .change.ng-enter {
@@ -88,39 +84,39 @@
     </div>
  
     <div class="container" style="width:800px;height:200px; font-size:12px; color:white;background:#303030; border:2px solid orange;">
-        <div>
-            <div class="row vertical-align" style="background:#202020;height: 50px;">
-                <div class="col-md-3" style="font-size:24px">Equity Quote</div>
-                <div class="col-md-2">
-                    <form ng-submit="quote.requestItem()">
-                        <input ng-disabled="quote.needsConfiguration" type="text" value={{quote.requestedRic}} ng-model="quote.requestedRic" 
-                               size="12" style="color:white;background:black" required>
-                        </input>
-                    </form>
-                </div>
-                <div class="col-md-8" style="font-size:14px;">
-                    <div ng-show=quote.validRequest>
-                        <span title="DSPLY_NAME" class="color-orange">{{quote.widget.DSPLY_NAME}}</span>
-                        <span title="RDN_EXCHD2">&nbsp;({{quote.widget.RDN_EXCHD2}}</span>
-                        <span>:</span>
-                        <span title="PROV_SYMB">{{quote.widget.PROV_SYMB}})</span>
-                    </div>
-                    <span ng-show=!quote.validRequest class="color-red">{{quote.error}}</span>
-                </div>
+        <div class="row vertical-align" style="background:#202020;height: 50px;">
+            <div class="col-md-3" style="font-size:24px">Equity Quote</div>
+            <div class="col-md-2">
+                <form ng-submit="quote.requestItem()">
+                    <input ng-disabled="quote.needsConfiguration" type="text" value={{quote.requestedRic}} ng-model="quote.requestedRic" 
+                           size="12" style="color:white;background:black" required>
+                    </input>
+                </form>
             </div>
-            
-            <div ng-show=quote.needsConfiguration>
-                Before using this widget, the following configuration is required within the 'quoteObject.js' file.
-                Modify the following section:
-                <pre style="color:yellow;background-color:#303030; border:none">
-   app.constant('config', {
-      wsServer: '&lt;host:port&gt;',    // Address of our Eikon WebSocket server.  Format: &lt;ip&gt;:&lt;port&gt;
-      ...</pre>
-                
-                Provide your WebSocket host and port.  Eg:  'ads3:15000'.  Then reload this page.
+            <div class="col-md-8" style="font-size:14px;">
+                <div ng-show=quote.validRequest>
+                    <span title="DSPLY_NAME" class="color-orange change" animate-on-change="quote.widget.DSPLY_NAME">{{quote.widget.DSPLY_NAME}}</span>
+                    <span title="RDN_EXCHD2">&nbsp;({{quote.widget.RDN_EXCHD2}}</span>
+                    <span>:</span>
+                    <span title="PROV_SYMB">{{quote.widget.PROV_SYMB}})</span>
+                </div>
+                <span ng-show=!quote.validRequest class="color-red">{{quote.error}}</span>
             </div>
-            
-            <div ng-show=quote.validRequest>
+        </div>
+        
+        <div ng-show=quote.needsConfiguration>
+            Before using this widget, the following configuration is required within the 'quoteObject.js' file.
+            Modify the following sections:
+            <pre style="font-size:10px;color:yellow;background-color:#303030; border:none">
+app.constant('config', {
+  wsServer: '&lt;host:port&gt;',   // Address of our Eikon WebSocket server.  Format: &lt;ip&gt;:&lt;port&gt;
+  ...
+
+  wsService: 'ELEKTRON_EDGE',   // Elektron WebSocket service hosting realtime market data 
+  ...       </pre>
+        </div>
+      
+        <div ng-show=quote.validRequest>
                 <div class="row vertical-align gutter-10">
                     <div class="col-md-4" style="color:orange">
                         <span title="CURRENCY">{{quote.widget.CURRENCY}}</span>
@@ -136,7 +132,7 @@
                         </span>
                     </div>
                     <div class="col-md-8" style="font-size:14px">
-                        <span title="TRDTIM_1">{{quote.widget.TRDTIM_1 | substr:0:8}}</span>
+                        <span title="SALTIM" class="change" animate-on-change="quote.widget.SALTIM">{{quote.widget.SALTIM | substr:0:8}}</span>
                         <span class="wlabel"> - </span>
                         <span title="TRADE_DATE">{{quote.widget.TRADE_DATE | trDate}}</span>
                     </div>
@@ -149,8 +145,9 @@
                     <div class="col-md-2 wlabel">Acc. Volume</div>
                     <div title="ACVOL_1" class="col-md-2 change" animate-on-change="quote.widget.ACVOL_1">{{quote.widget.ACVOL_1}}</div>  
                     <div class="col-md-1 wlabel">VWAP</div>
-                    <div title="VWAP" class="col-md-1 change" animate-on-change="quote.widget.VWAP">{{quote.widget.VWAP | number:3}}</div>                      
+                    <div title="VWAP" class="col-md-1 change" animate-on-change="quote.widget.VWAP">{{quote.widget.VWAP | number:3}}</div>
                 </div>
+
                 <div class="row gutter-10">
                     <div title="TRDPRC_3" class="col-md-1 change" animate-on-change="quote.widget.TRDPRC_3">{{quote.widget.TRDPRC_3 | number:3}}</div>
                     <div class="col-md-1 wlabel">Open</div>
@@ -164,6 +161,7 @@
                         <span title="HSTCLSDATE">{{quote.widget.HSTCLSDATE | trDate}}</span>
                     </div>                      
                 </div>
+
                 <div class="row gutter-10">
                     <div title="TRDPRC_4" class="col-md-1 change" animate-on-change="quote.widget.TRDPRC_4">{{quote.widget.TRDPRC_4 | number:3}}</div> 
                     <div class="col-md-1 wlabel">Bid</div>
@@ -207,14 +205,13 @@
                     <div class="col-md-1 wlabel">P/E</div>
                     <div title="PERATIO" class="col-md-2">{{quote.widget.PERATIO | number:3}}</div>                         
                 </div>                
-            </div>
-        </div>        
+            </div>      
     </div>
     
     <div class="container" style="width:800px; color:white;background:#303030;">
         <div class="row gutter-10">
             <div class="col-md-1 wlabel">Status: </div>    
-            <div class="col-md-11" style="color:yellow;">
+            <div class="col-md-11" style="color:#F9E79F;">
                 <select class="status" animate-on-change="statusList[0]" style="width:100%; background-color:black" onchange="this.selectedIndex = 0;" 
                         ng-model="statusList[0]" ng-options="status.msg for status in statusList"></select>
             </div>
