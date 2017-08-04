@@ -21,7 +21,7 @@
     
     // Configuration
     app.constant('config', {
-        wsServer: '10.67.4.99:15000',   // Address of our Eikon WebSocket server.  Format: <ip>:<port>
+        wsServer: '<host:port>',        // Address of our Eikon WebSocket server.  Eg: ads:15000
         wsLogin: {                      // Elektron WebSocket login credentials
             user: 'user',
             appId: '256',
