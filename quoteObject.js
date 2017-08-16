@@ -1,13 +1,13 @@
 // ********************************************************************************************************
 // QuoteWidget.js
-// The QuoteWidget module is an Angular JS-based client utilizing Thomson Reuters Eikon WebSocket API to
+// The QuoteWidget module is an Angular JS-based client utilizing Thomson Reuters Elektron WebSocket API to
 // request and retrieve realtime market data.  The widget provides a display that is geared towards the 
 // display of Equity-based instruments showing updates such as trades and quotes in realtime.  In addition, 
 // the widget utlizes Angular JS animation to provide a visual clue when individual fields are updated.
 //
 // Author:  Nick Zincone
 // Version: 1.0
-// Date:    July 2017.
+// Date:    August 2017.
 // ********************************************************************************************************
 
 // App
@@ -21,7 +21,8 @@
     
     // Configuration
     app.constant('config', {
-        wsServer: '<host:port>',        // Address of our Eikon WebSocket server.  Eg: ads:15000
+        //wsServer: '<host:port>',        // Address of our Elektron WebSocket server.  Eg: ads:15000
+        wsServer: '10.67.4.99:15000',
         wsLogin: {                      // Elektron WebSocket login credentials
             user: 'user',
             appId: '256',

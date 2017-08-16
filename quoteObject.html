@@ -118,7 +118,7 @@ app.constant('config', {
       
         <div ng-show=quote.validRequest>
                 <div class="row vertical-align gutter-10">
-                    <div class="col-md-4" style="color:orange">
+                    <div class="col-xs-4" style="color:orange">
                         <span title="CURRENCY">{{quote.widget.CURRENCY}}</span>
                         <span style="font-size:16px" ng-class="{'color-red': quote.widget.PriceTick === 254, 'color-green': quote.widget.PriceTick === 222}">
                             {{quote.widget.PriceTick === 254 ? '&#x25BC;' : (quote.widget.PriceTick === 222 ? '&#x25B2;' : ' ')}}
@@ -131,7 +131,7 @@ app.constant('config', {
                             </span>
                         </span>
                     </div>
-                    <div class="col-md-8" style="font-size:14px">
+                    <div class="col-xs-8" style="font-size:14px">
                         <span title="SALTIM" class="change" animate-on-change="quote.widget.SALTIM">{{quote.widget.SALTIM | substr:0:8}}</span>
                         <span class="wlabel"> - </span>
                         <span title="TRADE_DATE">{{quote.widget.TRADE_DATE | trDate}}</span>
@@ -139,23 +139,23 @@ app.constant('config', {
                 </div>
                 
                 <div class="row gutter-10">
-                    <div title="TRDPRC_2" class="col-md-1 change" animate-on-change="quote.widget.TRDPRC_2">{{quote.widget.TRDPRC_2 | number:3}}</div>
-                    <div class="col-md-1 wlabel">Volume</div>
-                    <div title="TRDVOL_1" class="col-md-1 change" animate-on-change="quote.widget.TRDVOL_1">{{quote.widget.TRDVOL_1}}</div>
-                    <div class="col-md-2 wlabel">Acc. Volume</div>
-                    <div title="ACVOL_1" class="col-md-2 change" animate-on-change="quote.widget.ACVOL_1">{{quote.widget.ACVOL_1}}</div>  
-                    <div class="col-md-1 wlabel">VWAP</div>
-                    <div title="VWAP" class="col-md-1 change" animate-on-change="quote.widget.VWAP">{{quote.widget.VWAP | number:3}}</div>
+                    <div title="TRDPRC_2" class="col-xs-1 change" animate-on-change="quote.widget.TRDPRC_2">{{quote.widget.TRDPRC_2 | number:3}}</div>
+                    <div class="col-xs-1 wlabel">Volume</div>
+                    <div title="TRDVOL_1" class="col-xs-1 change" animate-on-change="quote.widget.TRDVOL_1">{{quote.widget.TRDVOL_1}}</div>
+                    <div class="col-xs-2 wlabel">Acc. Volume</div>
+                    <div title="ACVOL_1" class="col-xs-2 change" animate-on-change="quote.widget.ACVOL_1">{{quote.widget.ACVOL_1}}</div>  
+                    <div class="col-xs-1 wlabel">VWAP</div>
+                    <div title="VWAP" class="col-xs-1 change" animate-on-change="quote.widget.VWAP">{{quote.widget.VWAP | number:3}}</div>
                 </div>
 
                 <div class="row gutter-10">
-                    <div title="TRDPRC_3" class="col-md-1 change" animate-on-change="quote.widget.TRDPRC_3">{{quote.widget.TRDPRC_3 | number:3}}</div>
-                    <div class="col-md-1 wlabel">Open</div>
-                    <div title="OPEN_PRC" class="col-md-1">{{quote.widget.OPEN_PRC | number:3}}</div>
-                    <div class="col-md-2 wlabel">Today's Low</div>
-                    <div title="LOW_1" class="col-md-2 change" animate-on-change="quote.widget.LOW_1">{{quote.widget.LOW_1 | number:3}}</div>
-                    <div class="col-md-1 wlabel">Prev Cls</div>
-                    <div class="col-md-2">
+                    <div title="TRDPRC_3" class="col-xs-1 change" animate-on-change="quote.widget.TRDPRC_3">{{quote.widget.TRDPRC_3 | number:3}}</div>
+                    <div class="col-xs-1 wlabel">Open</div>
+                    <div title="OPEN_PRC" class="col-xs-1">{{quote.widget.OPEN_PRC | number:3}}</div>
+                    <div class="col-xs-2 wlabel">Today's Low</div>
+                    <div title="LOW_1" class="col-xs-2 change" animate-on-change="quote.widget.LOW_1">{{quote.widget.LOW_1 | number:3}}</div>
+                    <div class="col-xs-1 wlabel">Prev Cls</div>
+                    <div class="col-xs-2">
                         <span title="HST_CLOSE">{{quote.widget.HST_CLOSE | number:3}}</span>
                         <span class="wlabel"> - </span>                        
                         <span title="HSTCLSDATE">{{quote.widget.HSTCLSDATE | trDate}}</span>
@@ -163,12 +163,12 @@ app.constant('config', {
                 </div>
 
                 <div class="row gutter-10">
-                    <div title="TRDPRC_4" class="col-md-1 change" animate-on-change="quote.widget.TRDPRC_4">{{quote.widget.TRDPRC_4 | number:3}}</div> 
-                    <div class="col-md-1 wlabel">Bid</div>
-                    <div title="BID" class="col-md-1 change" animate-on-change="quote.widget.BIDSIZE">{{quote.widget.BID | number:3}}</div> 
-                    <div class="col-md-2 wlabel">Today's High</div>
-                    <div title="HIGH_1" class="col-md-2 change" animate-on-change="quote.widget.HIGH_1">{{quote.widget.HIGH_1 | number:3}}</div>
-                    <div class="col-md-1 wlabel">Div/Yield</div>
+                    <div title="TRDPRC_4" class="col-xs-1 change" animate-on-change="quote.widget.TRDPRC_4">{{quote.widget.TRDPRC_4 | number:3}}</div> 
+                    <div class="col-xs-1 wlabel">Bid</div>
+                    <div title="BID" class="col-xs-1 change" animate-on-change="quote.widget.BIDSIZE">{{quote.widget.BID | number:3}}</div> 
+                    <div class="col-xs-2 wlabel">Today's High</div>
+                    <div title="HIGH_1" class="col-xs-2 change" animate-on-change="quote.widget.HIGH_1">{{quote.widget.HIGH_1 | number:3}}</div>
+                    <div class="col-xs-1 wlabel">Div/Yield</div>
                     <div title="YIELD" class="col-md-2">
                         <span title="DIVIDEND">{{quote.widget.DIVIDEND | number:3}}</span>
                         <span class="wlabel">/</span>
@@ -176,42 +176,42 @@ app.constant('config', {
                     </div>                     
                 </div>
                 <div class="row gutter-10">
-                    <div title="TRDPRC_5" class="col-md-1 change" animate-on-change="quote.widget.TRDPRC_5">{{quote.widget.TRDPRC_5 | number:3}}</div> 
-                    <div class="col-md-1 wlabel">Ask</div>
-                    <div title="ASK" class="col-md-1 change" animate-on-change="quote.widget.ASKSIZE">{{quote.widget.ASK | number:3}}</div>
-                    <div class="col-md-2 wlabel">52 Week Range</div>
-                    <div class="col-md-2 change">
+                    <div title="TRDPRC_5" class="col-xs-1 change" animate-on-change="quote.widget.TRDPRC_5">{{quote.widget.TRDPRC_5 | number:3}}</div> 
+                    <div class="col-xs-1 wlabel">Ask</div>
+                    <div title="ASK" class="col-xs-1 change" animate-on-change="quote.widget.ASKSIZE">{{quote.widget.ASK | number:3}}</div>
+                    <div class="col-xs-2 wlabel">52 Week Range</div>
+                    <div class="col-xs-2 change">
                         <span title="YRLOW" animate-on-change="quote.widget.YRLOW">{{quote.widget.YRLOW | number:2}}</span>
                         <span class="wlabel"> - </span>
                         <span title="YRHIGH" animate-on-change="quote.widget.YRHIGH">{{quote.widget.YRHIGH | number:2}}</span>
                     </div> 
-                    <div class="col-md-1 wlabel">EPS</div>
-                    <div title="EARNINGS" class="col-md-2">{{quote.widget.EARNINGS | number:3}}</div>                       
+                    <div class="col-xs-1 wlabel">EPS</div>
+                    <div title="EARNINGS" class="col-xs-2">{{quote.widget.EARNINGS | number:3}}</div>                       
                 </div>
                 <div class="row gutter-10">
-                    <div class="col-md-1"></div> 
-                    <div class="col-md-1 wlabel">Size</div>
-                    <div class="col-md-1">
+                    <div class="col-xs-1"></div> 
+                    <div class="col-xs-1 wlabel">Size</div>
+                    <div class="col-xs-1">
                         <span title="BIDSIZE" class="change" animate-on-change="quote.widget.BIDSIZE">{{quote.widget.BIDSIZE}}</span>
                         <span class="wlabel">x</span>
                         <span title="ASKSIZE" class="change" animate-on-change="quote.widget.BIDSIZE">{{quote.widget.ASKSIZE}}</span>
                     </div> 
-                    <div class="col-md-2 wlabel"></div>
-                    <div class="col-md-2 change">
+                    <div class="col-xs-2 wlabel"></div>
+                    <div class="col-xs-2 change">
                         <span title="YRLOWDAT" animate-on-change="quote.widget.yearLowDate">{{quote.widget.YRLOWDAT | trDate}}</span>
                         <span class="wlabel"> - </span>
                         <span title="YRHIGHDAT" animate-on-change="quote.widget.yearHighDate">{{quote.widget.YRHIGHDAT | trDate}}</span>
                     </div>  
-                    <div class="col-md-1 wlabel">P/E</div>
-                    <div title="PERATIO" class="col-md-2">{{quote.widget.PERATIO | number:3}}</div>                         
+                    <div class="col-xs-1 wlabel">P/E</div>
+                    <div title="PERATIO" class="col-xs-2">{{quote.widget.PERATIO | number:3}}</div>                         
                 </div>                
             </div>      
     </div>
     
     <div class="container" style="width:800px; color:white;background:#303030;">
         <div class="row gutter-10">
-            <div class="col-md-1 wlabel">Status: </div>    
-            <div class="col-md-11" style="color:#F9E79F;">
+            <div class="col-xs-1 wlabel">Status: </div>    
+            <div class="col-xs-11" style="color:#F9E79F;">
                 <select class="status" animate-on-change="statusList[0]" style="width:100%; background-color:black" onchange="this.selectedIndex = 0;" 
                         ng-model="statusList[0]" ng-options="status.msg for status in statusList"></select>
             </div>
