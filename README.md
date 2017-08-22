@@ -40,10 +40,14 @@ Software components used:
 If you have access to an ADS that is enabled to deliver market data via the Elektron WebSocket API, you can attempt to run within your own setup and reference the source code that is [available within GitHub](https://github.com/TR-API-Samples/Article.WebSocketAPI.Javascript.QuoteWidget).
 
 The application package includes the following:
+* **TRQuoteController.js**
+
+  The TRQuoteController is a generic interface used to manage all communication to the Elektron WebSocket server.  This design was intentional allowing the use of any Javascript framework to implement the desired solution.  Although a number of frameworks were possible, in this implementation, we chose Angular JS to build our widget.
+ 
 * **quoteObject.html / 
 quoteObject.js**
   
-  HTML/JavaScript hosting the entire application.
+  HTML/JavaScript utilizing the Angular JS framework to build our widget..
 
 * **css / fonts / js**
   
