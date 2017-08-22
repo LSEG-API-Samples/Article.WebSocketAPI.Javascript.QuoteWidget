@@ -11,6 +11,7 @@
 //      TRQuoteController.connect(server, user, appId="256", position="127.0.0.1");
 //      TRQuoteController.requestData(ric, serviceName, streaming=true);
 //      TRQuoteController.closeRequest(id)
+//      TRQuoteController.closeAllRequests()
 //      TRQuoteController.loggedIn()
 //      TRQuoteController.onStatus(eventFn)
 //      TRQuoteController.onMarketData(eventFn)
@@ -43,7 +44,7 @@ function TRQuoteController() {
     var  _requestIDs = [];
     
     // Retrieve the next available ID from our ID table
-    this.getID = function() {
+    this._getID = function() {
         for (var i in _requestIDs) {
             if (!_requestIDs[i]) {
                 _requestIDs[i] = true;
@@ -56,12 +57,21 @@ function TRQuoteController() {
     }
 
     // Flag the request ID to be removed (available)
-    this.removeID = function(id) {
+    this._removeID = function(id) {
         if ( _requestIDs[id] ) {
             _requestIDs[id] = false;
             return(true);
         }
         return(false);
+    }
+    
+    // Get first ID with an open stream.  Note: ignores first entry - our login stream.
+    this._getAvailableStreams = function() {
+        var result = [];
+        for (var i in _requestIDs)
+            if ( _requestIDs[i] && parseInt(i)>0 ) result[result.length] = i;
+        
+        return(result);
     }
 }
 
@@ -114,7 +124,7 @@ TRQuoteController.prototype.requestData = function(ric, serviceName, streaming=t
         return(0);
     
     // Rolling ID
-    var id = this.getID();
+    var id = this._getID();
     
     // send marketPrice request message
     var marketPrice = {
@@ -138,7 +148,7 @@ TRQuoteController.prototype.requestData = function(ric, serviceName, streaming=t
 //   
 TRQuoteController.prototype.closeRequest = function(id) 
 {
-    // Dend Close request message
+    // Close request message
     var close = {
         Id: id,
         Type: "Close"
@@ -148,7 +158,21 @@ TRQuoteController.prototype.closeRequest = function(id)
     this._send(JSON.stringify(close));
     
     // Cleanup our ID table
-    this.removeID(id);
+    this._removeID(id);
+};
+
+// TRQuoteController.closeAllRequests
+//
+// Close all outstanding streaming requests.
+//   
+TRQuoteController.prototype.closeAllRequests = function() 
+{
+    // Retrieve all open streams
+    var openStreams = this._getAvailableStreams();
+    
+    // For each one, close
+    for (var i in openStreams)
+        this.closeRequest(parseInt(openStreams[i]));
 };
 
 //
@@ -261,7 +285,7 @@ TRQuoteController.prototype._onMessage = function (msg)
                     if ( this.isCallback(this._statusCb) ) this._statusCb(this.status.loginResponse, msg);
                 } else if ( msg.Type === "Status" ) {
                     // Issue on our message stream.  Make our ID available is stream is closed.
-                    if ( msg.State.Stream == "Closed") this.removeID(msg.Id);
+                    if ( msg.State.Stream == "Closed") this._removeID(msg.Id);
                     
                     // Report potential issues with our requested market data item
                     if ( this.isCallback(this._statusCb) ) this._statusCb(this.status.msgStatus, msg);                        
@@ -269,7 +293,7 @@ TRQuoteController.prototype._onMessage = function (msg)
                else {
                     // Otherwise, we must have received some kind of market data message.  
                     // First update our ID table based on the refresh
-                    if ( msg.Type === "Refresh" && msg.State.Stream === "NonStreaming" ) this.removeID(msg.Id);
+                    if ( msg.Type === "Refresh" && msg.State.Stream === "NonStreaming" ) this._removeID(msg.Id);
                     
                     // Allow the application to process message
                     if ( this.isCallback(this._marketDataCb) ) this._marketDataCb(msg);
@@ -305,7 +329,7 @@ TRQuoteController.prototype._login = function ()
 {
     // send login request message
     var login = {
-        Id: this.getID(),
+        Id: this._getID(),
         Domain:	"Login",
         Key: {
             Name: this._loginParams.user,

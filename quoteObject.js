@@ -198,7 +198,7 @@
         this.closeRequest = function(id) {
             // Only CLOSE if we have something outstanding...
             if ( config.streaming && this.validRequest )
-                this.quoteController.closeRequest(id);                    
+                this.quoteController.closeRequest(id);
         };
         
         //*******************************************************************************************
