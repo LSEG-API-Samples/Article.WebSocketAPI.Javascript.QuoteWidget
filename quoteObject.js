@@ -1,7 +1,7 @@
 // ********************************************************************************************************
 // QuoteWidget.js
 // The QuoteWidget module is an Angular JS-based client utilizing Thomson Reuters Elektron WebSocket API to
-// request and retrieve realtime market data.  The widget provides a display that is geared towards the 
+// request and retrieve realtime market data.  The widget provides a interface that is geared towards the 
 // display of Equity-based instruments showing updates such as trades and quotes in realtime.  In addition, 
 // the widget utlizes Angular JS animation to provide a visual clue when individual fields are updated.
 //
@@ -21,8 +21,7 @@
     
     // Configuration
     app.constant('config', {
-        //wsServer: '<host:port>',        // Address of our Elektron WebSocket server.  Eg: ads:15000
-        wsServer: '10.67.4.99:15000',
+        wsServer: '<host:port>',        // Address of our Elektron WebSocket server.  Eg: ads:15000
         wsLogin: {                      // Elektron WebSocket login credentials
             user: 'user',
             appId: '256',
@@ -115,165 +114,53 @@
         this.error = "";
         this.requestID = 0;
         this.widget = {};
-        this.connected = false;
         this.needsConfiguration = (config.wsServer === '<host:port>');
         
-        this.connect = function ()
-        {        
-            widgetStatus.update("Connecting to the WebSocket service on [host:port] " + config.wsServer + "...");
-            
-             // Connect into our WebSocket server
-            this.ws = new WebSocket("ws://" + config.wsServer+ "/WebSocket", "tr_json2");
-            this.ws.onopen = this.onopen;
-            this.ws.onmessage = this.onmessage;
-            this.ws.onclose = this.onclose;               
-            
-            return(this);
-        };
-        
-        // Onopen
-        // We arrive here upon a valid connection to our Elektron WebSocket server.  Upon a valid connection,
-        // we issue a request to login to the server.
-        this.onopen = function()
-        {
-            widgetStatus.update("Connection to server is UP.");
-
-            // Login to our WebSocket server
-            self.login(config.wsLogin);
-        };
-
-        // onmessage
-        // All messages received from our WebSocket server after we have successfully connected are processed here.
-        // 
-        // Messages received:
-        //
-        //  Login response: Resulting from our request to login.
-        //  Ping request:   The WebSocket Server will periodically send a 'ping' - we respond with a 'pong'
-        //  Data message:   Refresh and update market data messages resulting from our item request
-        //
-        this.onmessage = function (msg)
-        {
-            // Ensure we have a valid message
-            if (typeof (msg.data) === 'string' && msg.data.length > 0)
-            {
-                try {
-                    // Parse the contents into a JSON structure for easy access
-                    var result = JSON.parse(msg.data);
-
-                    // Our messages are packed within arrays - iterate
-                    var size = result.length;
-                    var msg = {}
-                    for (var i=0; i < size; i++) {
-                        msg = result[i];
-                        
-                        // Did we encounter a PING?
-                        if ( msg.Type === "Ping" ) {
-                            // Yes, so send a Pong to keep the channel alive
-                            self.pong();
-                        } else if ( msg.Id === config.wsLogin.id ) { // Did we get our login response?
-                            // Yes, process it
-                            self.processLogin(msg);
-                        } else if ( msg.Type === "Status" ) {
-                            // Report potential issues with our requested market data item
-                            self.error = (msg.Key ? msg.Key.Name+":" : "");
-                            self.error += msg.State.Text;
-                            widgetStatus.update("Status response for item: " + self.error);
-                        }
-                       else {
-                            // Otherwise, we must have received some kind of market data message
-                            self.processMarketData(msg);
-                       }
-                    }
-                }
-                catch (e) {
-                    widgetStatus.update(e.message);
-                }       
-            }
-        }
-
-        // onclose
-        // In the event we could not initially connect or if our endpoint disconnected our connection, the event
-        // is captured here.  We simply report and make note.
-        this.onclose = function (closeEvent) {
-            widgetStatus.update("Connection to server is Down/Unavailable");
-            self.connected = false;
-        };
-
-        this.send = function (text) {
-            if (this.ws)
-                this.ws.send(text);
-        };
-            
+        // Our Elektron WebSocket interface
+        this.quoteController = new TRQuoteController();
+       
         // Connect into our realtime server
-        if ( !this.needsConfiguration )
-            this.connect();
-
-        // Send data
-        $scope.$on('send', function (event, msg) {
-            self.send(msg);
+        if ( !this.needsConfiguration ) {
+            widgetStatus.update("Connecting to the WebSocket service on [host:port] " + config.wsServer + "...");
+            this.quoteController.connect(config.wsServer, config.wsLogin.user, config.wsLogin.appId, config.wsLogin.position);           
+        }
+        
+        //*******************************************************************************
+        // TRQuoteController.onStatus
+        //
+        // Capture all TRQuoteController status messages.
+        //*******************************************************************************        
+        this.quoteController.onStatus(function(eventCode, msg) {
+            switch (eventCode) {                    
+                case this.status.connected:
+                    // TRQuoteController first reports success then will automatically attempt to log in to the TR WebSocket server...
+                    widgetStatus.update("Connection to server is UP.");
+                    widgetStatus.update("Login request with user: [" + config.wsLogin.user + "]");
+                    break;
+                    
+                case this.status.disconnected:
+                    widgetStatus.update("Connection to server is Down/Unavailable");
+                    break;
+                    
+                case this.status.loginResponse:
+                    self.processLogin(msg);
+                    break;
+                    
+                case this.status.msgStatus:
+                    // Report potential issues with our requested market data item
+                    self.error = (msg.Key ? msg.Key.Name+":" : "");
+                    self.error += msg.State.Text;
+                    widgetStatus.update("Status response for item: " + self.error);                
+                    break;
+                    
+                case this.status.processingError:
+                    // Report any general controller issues
+                    widgetStatus.update(msg);
+                    break;
+            }
         });
-
-        //*******************************************************************************
-        // login
-        // Once we connect into our Elektron WebSocket server, issue a login request as: 
-        //
-        // Eg JSON request format:
-        // {
-        //     "Domain": "Login",
-        //     "Id": 1,
-        //     "Key": {
-        //        "Name": "user",
-        //        "Elements": {
-        //           "ApplicationId": "256",
-        //           "Position": "127.0.0.1"
-        //     }
-        // }
-        //
-        // The supplied 'login' parameter contains our login configuration details.
-        //******************************************************************************
-        this.login = function (login) {
-            widgetStatus.update("Login request with user: [" + login.user + "]");
-            
-            // send login request message
-            var login = {
-                Id: login.id,
-                Domain:	"Login",
-                Key: {
-                    Name: login.user,
-                    Elements:	{
-                        ApplicationId: login.appId,
-                        Position: login.position
-                    }
-                }
-            };
-
-            // Submit to server
-            this.send(JSON.stringify(login));
-        };
         
-        //*******************************************************************************
-        // pong
-        // To keep the Elektron WebSocket connection active, we must periodically send a
-        // notification to the server.  The WebSocket server sends a 'Ping' message and 
-        // once received, our application acknowldges and sends a 'Pong'. 
-        //
-        // JSON request format:
-        // {
-        //     "Type": "Pong"
-        // }
-        //
-        //**************************************************************
-        this.pong = function () {
-            // Send Pong response
-            var pong = {
-                Type: "Pong"
-            };
-
-            // Submit to server
-            this.send(JSON.stringify(pong));
-        };        
-        
-        //*******************************************************************************
+        //*********************************************************************************
         // processLogin
         // Determine if we have successfully logged into our WebSocket server.  Within
         // our Login response, we need to check the following stanza:
@@ -284,112 +171,72 @@
         //     "Text": <reason>
         //  }
         //
-        // We simply update the status with our result.
-        //
-        //*******************************************************************************
+        // If we logged in, submit our initial marketPrice request to our quote controller.
+        //*********************************************************************************
         this.processLogin = function (msg) {
             widgetStatus.update("Login state: " + msg.State.Stream + "/" + msg.State.Data + "/" + msg.State.Text);
 
-            self.connected = msg.State.Data === "Ok";
-            
-            // Send off our initial MarketPrice request
-            self.sendMarketPrice(self.requestedRic);
+            if (this.quoteController.loggedIn())
+                this.requestMarketPrice(this.requestedRic);  // Send off our initial MarketPrice request
         }; 
 
         //*******************************************************************************
         // requestItem
-        // When a user requests for an item from our widget, we fire off the request to
-        // our server.
+        // Based on user input from our widget UI, request for that item from our server.
         //*******************************************************************************
         this.requestItem = function()
         {
             // No need to do anything if current request is the same
-            if ( self.requestedRic != self.Ric )
-                self.sendMarketPrice(self.requestedRic);
+            if ( this.requestedRic != this.Ric )
+                this.requestMarketPrice(this.requestedRic);
         }
         
         //*******************************************************************************************
         // closeRequest
         //
-        // Eg JSON request format:
-        // {
-        //     "Id": 2,
-        //     "Type": "Close"
-        // }
         //*******************************************************************************************   
-        this.closeRequest = function(item) {
+        this.closeRequest = function(id) {
             // Only CLOSE if we have something outstanding...
-            if ( config.streaming && self.validRequest ) {
-                // send marketPrice request message
-                var close = {
-                    Id: self.requestID,
-                    Type: "Close"
-                };
-
-                // Submit to server
-                this.send(JSON.stringify(close));               
-            }                     
+            if ( config.streaming && this.validRequest )
+                this.quoteController.closeRequest(id);                    
         };
         
         //*******************************************************************************************
-        // sendMarketPrice
+        // requestMarketPrice
         //
-        // Eg JSON request format:
-        // {
-        //     "Id": 2,
-        //     "Key": {
-        //        "Name": "TRI.N",
-        //        "Service": "ELEKTRON_EDGE"
-        //     }
-        // }
-        //
-        // The 'Id' must be unique for each request for market data.  Because our widget will only
-        // maintain one outstanding streaming request, we utilize a simple rolling number system for
-        // our ID's.  In addition, whenever we we want to issue a new request, we also CLOSE the 
-        // current stream, if one is open, to avoid issues as we eventually reuse ID's during 
-        // rollover.
+        // Our widget maintains only 1 outstanding streaming request.  As a result, we request for 
+        // our new item and also close our current stream.
         //*******************************************************************************************   
-        this.sendMarketPrice = function(item) {
-            if ( !self.connected )
+        this.requestMarketPrice = function(item) {
+            if ( !this.quoteController.loggedIn() )
                 return;
                 
             widgetStatus.update("MarketPrice request: [" + item + "]");
             
-            // Close our current item we are watching
-            self.closeRequest(self.requestID);
-                     
-            // Rolling ID
-            self.requestID = (self.requestID % 100) + 1;
-            
-            // send marketPrice request message
-            var marketPrice = {
-                Id: self.requestID,
-                Streaming: config.streaming,
-                Key: {
-                    Name: item,
-                    Service: config.wsService
-                }
-            };
+            // Send request
+            var id = this.quoteController.requestData(item, config.wsService, config.streaming);
+            console.log("Requesting item: " + item + " using ID: " + id);
+
+            // Close our current item we are watching.  We do this after to ensure there is no conflict with ID's.
+            this.closeRequest(this.requestID);
+            this.requestID = id;
             
             // Request becomes valid when we get a valid response
-            self.validRequest = false;
-            self.error = "";
-
-            // Submit to server
-            this.send(JSON.stringify(marketPrice));           
+            this.validRequest = false;
+            this.error = "";
         };
-        
+
         //********************************************************************************************
-        // processMarketData
-        // When requesting for market data, some form of response (or responses) will be
-        // delivered from the Elektron WebSocket Server.  Here are the types of messages
-        // expected to arrive:
+        // TRQuoteController.onMarketData
+        // Capture all TRQuoteController market data messages.
+        // After requesting for market data, some form of response (or responses) will be delivered 
+        // from the Elektron WebSocket Server.  When a message arrives, we make a distinction based
+        // on the following:
         //
         //  - Refresh: Initial image received after requesting data.  All fields are included.
         //  - Update: Realtime update based on market conditions.  Only fields changed are included.
-        //
-        //********************************************************************************************
-        this.processMarketData = function (msg) {            
+        //********************************************************************************************        
+        this.quoteController.onMarketData(function(msg) {
             if ( msg.Type === "Refresh")
                 self.processRefresh(msg);
             else
@@ -398,17 +245,17 @@
             // Processing of some FIDs common to both Refresh and Update
             if ( msg.Type === "Refresh" || msg.UpdateType === "ClosingRun" ) {
                 // Trade Price (modified)
-                this.widget.TRDPRC_1 = (msg.Fields.TRDPRC_1 ? msg.Fields.TRDPRC_1 : msg.Fields.HST_CLOSE);
+                self.widget.TRDPRC_1 = (msg.Fields.TRDPRC_1 ? msg.Fields.TRDPRC_1 : msg.Fields.HST_CLOSE);
 
                 // Change indicators (modified)
-                this.widget.NETCHNG_1 = (msg.Fields.NETCHNG_1 ? msg.Fields.NETCHNG_1 : 0);
-                this.widget.PCTCHNG = (msg.Fields.PCTCHNG ? msg.Fields.PCTCHNG : 0);
-                this.widget.PriceTick = (msg.Fields.PRCTCK_1 ? msg.Fields.PRCTCK_1.charCodeAt(0) : '');                 
+                self.widget.NETCHNG_1 = (msg.Fields.NETCHNG_1 ? msg.Fields.NETCHNG_1 : 0);
+                self.widget.PCTCHNG = (msg.Fields.PCTCHNG ? msg.Fields.PCTCHNG : 0);
+                self.widget.PriceTick = (msg.Fields.PRCTCK_1 ? msg.Fields.PRCTCK_1.charCodeAt(0) : '');                 
             }
                     
             // Propagate all model changes into the view
             $scope.$apply();
-        }
+        });
         
         //********************************************************************************************
         // processRefresh
@@ -418,9 +265,9 @@
         //********************************************************************************************
         this.processRefresh = function (msg) {
             // Remember some details upon our initial image
-            self.validRequest = true;
-            self.Ric = msg.Key.Name;
-            self.widget = msg.Fields;
+            this.validRequest = true;
+            this.Ric = msg.Key.Name;
+            this.widget = msg.Fields;
             
             console.log(msg);            
         };       
@@ -434,10 +281,10 @@
         this.processUpdate = function (msg) {
             // Recent trades (ripple fields)
             if ( msg.Fields.TRDPRC_1 ) {
-                self.widget.TRDPRC_5 = self.widget.TRDPRC_4;
-                self.widget.TRDPRC_4 = self.widget.TRDPRC_3;
-                self.widget.TRDPRC_3 = self.widget.TRDPRC_2;               
-                self.widget.TRDPRC_2 = self.widget.TRDPRC_1; 
+                this.widget.TRDPRC_5 = this.widget.TRDPRC_4;
+                this.widget.TRDPRC_4 = this.widget.TRDPRC_3;
+                this.widget.TRDPRC_3 = this.widget.TRDPRC_2;               
+                this.widget.TRDPRC_2 = this.widget.TRDPRC_1; 
                 
                 this.widget.PriceTick = (msg.Fields.PRCTCK_1 ? msg.Fields.PRCTCK_1.charCodeAt(0) : this.widgetPriceTick);
             }
@@ -445,9 +292,8 @@
             // Copy over the update FIDs - our widget will automatically update with changes
             for (var key in msg.Fields) {
                 if (msg.Fields.hasOwnProperty(key))
-                    self.widget[key] = msg.Fields[key];
+                    this.widget[key] = msg.Fields[key];
             }
         };
     });
 })();
-   
