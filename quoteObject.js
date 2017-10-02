@@ -7,7 +7,7 @@
 //
 // Author:  Nick Zincone
 // Version: 1.0
-// Date:    August 2017.
+// Date:    September 2017.
 // ********************************************************************************************************
 
 // App
@@ -21,7 +21,8 @@
     
     // Configuration
     app.constant('config', {
-        wsServer: '<host:port>',        // Address of our Elektron WebSocket server.  Eg: ads:15000
+        //wsServer: '<host:port>',        // Address of our Elektron WebSocket server.  Eg: ads:15000
+        wsServer: '10.67.4.99:15000',        
         wsLogin: {                      // Elektron WebSocket login credentials
             user: 'user',
             appId: '256',
@@ -117,7 +118,7 @@
         this.needsConfiguration = (config.wsServer === '<host:port>');
         
         // Our Elektron WebSocket interface
-        this.quoteController = new TRQuoteController();
+        this.quoteController = new TRWebSocketController();
        
         // Connect into our realtime server
         if ( !this.needsConfiguration ) {
@@ -131,6 +132,7 @@
         // Capture all TRQuoteController status messages.
         //*******************************************************************************        
         this.quoteController.onStatus(function(eventCode, msg) {
+            console.log(eventCode + "==>" + msg);
             switch (eventCode) {                    
                 case this.status.connected:
                     // TRQuoteController first reports success then will automatically attempt to log in to the TR WebSocket server...

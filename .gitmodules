@@ -1,0 +1,3 @@
+[submodule "TRWebSocketController"]
+	path = TRWebSocketController
+	url = https://github.com/TR-API-Samples/Example.WebSocketAPI.Javascript.TRWebSocketController
