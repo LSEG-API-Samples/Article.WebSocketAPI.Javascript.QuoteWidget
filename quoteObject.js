@@ -21,8 +21,7 @@
     
     // Configuration
     app.constant('config', {
-        //wsServer: '<host:port>',        // Address of our Elektron WebSocket server.  Eg: ads:15000      
-        wsServer: 'ewa:15000',        // Address of our Elektron WebSocket server.  Eg: ads:15000		
+        wsServer: '<host:port>',        // Address of our Elektron WebSocket server.  Eg: ads:15000      		
         wsLogin: {                      // Elektron WebSocket login credentials
             user: 'user',
             appId: '256',
