@@ -21,17 +21,15 @@
     
     // Configuration
     app.constant('config', {
-        //wsServer: '<host:port>',        // Address of our Elektron WebSocket server.  Eg: ads:15000
-        wsServer: '10.67.4.99:15000',        
+        //wsServer: '<host:port>',        // Address of our Elektron WebSocket server.  Eg: ads:15000      
+        wsServer: 'ewa:15000',        // Address of our Elektron WebSocket server.  Eg: ads:15000		
         wsLogin: {                      // Elektron WebSocket login credentials
             user: 'user',
             appId: '256',
             position: '127.0.0.1',
-            id: 500                     // Request ID - used to easily identify login response
         },
         wsService: 'ELEKTRON_EDGE',     // Elektron WebSocket service hosting realtime market data    
         wsInitialRic: 'TRI.N',
-        wsStreamingID: 10,              // All MarketPrice streaming requests use the same ID.
         streaming: true                 // We should always be streaming, but for testing we can change
     });
     
@@ -132,7 +130,6 @@
         // Capture all TRQuoteController status messages.
         //*******************************************************************************        
         this.quoteController.onStatus(function(eventCode, msg) {
-            console.log(eventCode + "==>" + msg);
             switch (eventCode) {                    
                 case this.status.connected:
                     // TRQuoteController first reports success then will automatically attempt to log in to the TR WebSocket server...
@@ -212,12 +209,10 @@
         this.requestMarketPrice = function(item) {
             if ( !this.quoteController.loggedIn() )
                 return;
-                
-            widgetStatus.update("MarketPrice request: [" + item + "]");
             
             // Send request
             var id = this.quoteController.requestData(item, config.wsService, config.streaming);
-            console.log("Requesting item: " + item + " using ID: " + id);
+            widgetStatus.update("MarketPrice request: [" + item + "] using ID: " + id);
 
             // Close our current item we are watching.  We do this after to ensure there is no conflict with ID's.
             this.closeRequest(this.requestID);
@@ -269,9 +264,7 @@
             // Remember some details upon our initial image
             this.validRequest = true;
             this.Ric = msg.Key.Name;
-            this.widget = msg.Fields;
-            
-            console.log(msg);            
+            this.widget = msg.Fields;          
         };       
 
         //********************************************************************************************
