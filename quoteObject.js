@@ -17,11 +17,11 @@
     // Main application module.  This application depends on the Angular 'ngAnimate' module.
     // As the name implies, 'ngAnimate' provides animation using CSS styles which allows visual 
     // feedback when a field is updated in realtime.
-    var app = angular.module('QuoteWidget',['ngAnimate']);
+    let app = angular.module('QuoteWidget',['ngAnimate']);
     
     // Configuration
     app.constant('config', {
-        wsServer: '<host:port>',        // Address of our Elektron WebSocket server.  Eg: ads:15000      		
+        wsServer: '<host:port>',        // Address of our Elektron WebSocket server.  Eg: ads:15000
         wsLogin: {                      // Elektron WebSocket login credentials
             user: 'user',
             appId: '256',
@@ -60,13 +60,13 @@
     //                and display as a pull-down list to see history.
     //******************************************************************************************
     app.factory('widgetStatus', function ($timeout) {
-        var statusList = [];
+        let statusList = [];
 
         return ({
             list: function () { return (statusList); },
             update: function (txt) {
                 console.log(txt);
-                var status = statusList[0];
+                let status = statusList[0];
                 if (!status || status.msg != txt) {
                     if (status)
                         statusList[0].id = 1;
@@ -104,13 +104,12 @@
     app.controller('widgetController', function ($scope, $rootScope, widgetStatus, config )
     {
         // Some initialization
-        var self = this;
+        let self = this;
         $scope.statusList = widgetStatus.list();
         this.requestedRic = config.wsInitialRic;       
         this.Ric = "";
         this.validRequest = false;
         this.error = "";
-        this.requestID = 0;
         this.widget = {};
         this.needsConfiguration = (config.wsServer === '<host:port>');
         
@@ -193,10 +192,10 @@
         // closeRequest
         //
         //*******************************************************************************************   
-        this.closeRequest = function(id) {
+        this.closeRequest = function(ric) {
             // Only CLOSE if we have something outstanding...
-            if ( config.streaming && this.validRequest )
-                this.quoteController.closeRequest(id);
+            if ( this.validRequest )
+                this.quoteController.closeRequest(ric);
         };
         
         //*******************************************************************************************
@@ -206,16 +205,12 @@
         // our new item and also close our current stream.
         //*******************************************************************************************   
         this.requestMarketPrice = function(item) {
-            if ( !this.quoteController.loggedIn() )
-                return;
-            
             // Send request
-            var id = this.quoteController.requestData(item, config.wsService, config.streaming);
-            widgetStatus.update("MarketPrice request: [" + item + "] using ID: " + id);
+            this.quoteController.requestData(item, {Service: config.wsService, Streaming: config.streaming});
+            widgetStatus.update("MarketPrice request: [" + item + "]");
 
             // Close our current item we are watching.  We do this after to ensure there is no conflict with ID's.
-            this.closeRequest(this.requestID);
-            this.requestID = id;
+            this.closeRequest(this.Ric);
             
             // Request becomes valid when we get a valid response
             this.validRequest = false;
@@ -233,24 +228,23 @@
         //  - Update: Realtime update based on market conditions.  Only fields changed are included.
         //********************************************************************************************        
         this.quoteController.onMarketData(function(msg) {
-            if ( msg.Type === "Refresh")
-                self.processRefresh(msg);
-            else
-                self.processUpdate(msg);
-            
-            // Processing of some FIDs common to both Refresh and Update
-            if ( msg.Type === "Refresh" || msg.UpdateType === "ClosingRun" ) {
-                // Trade Price (modified)
-                self.widget.TRDPRC_1 = (msg.Fields.TRDPRC_1 ? msg.Fields.TRDPRC_1 : msg.Fields.HST_CLOSE);
+            $scope.$apply( function() {			
+				if ( msg.Type === "Refresh")
+					self.processRefresh(msg);
+				else
+					self.processUpdate(msg);
+				
+				// Processing of some FIDs common to both Refresh and Update
+				if ( msg.Type === "Refresh" || msg.UpdateType === "ClosingRun" ) {
+					// Trade Price (modified)
+					self.widget.TRDPRC_1 = (msg.Fields.TRDPRC_1 ? msg.Fields.TRDPRC_1 : msg.Fields.HST_CLOSE);
 
-                // Change indicators (modified)
-                self.widget.NETCHNG_1 = (msg.Fields.NETCHNG_1 ? msg.Fields.NETCHNG_1 : 0);
-                self.widget.PCTCHNG = (msg.Fields.PCTCHNG ? msg.Fields.PCTCHNG : 0);
-                self.widget.PriceTick = (msg.Fields.PRCTCK_1 ? msg.Fields.PRCTCK_1.charCodeAt(0) : '');                 
-            }
-                    
-            // Propagate all model changes into the view
-            $scope.$apply();
+					// Change indicators (modified)
+					self.widget.NETCHNG_1 = (msg.Fields.NETCHNG_1 ? msg.Fields.NETCHNG_1 : 0);
+					self.widget.PCTCHNG = (msg.Fields.PCTCHNG ? msg.Fields.PCTCHNG : 0);
+					self.widget.PriceTick = (msg.Fields.PRCTCK_1 ? msg.Fields.PRCTCK_1.charCodeAt(0) : '');                 
+				}
+			});
         });
         
         //********************************************************************************************
@@ -284,7 +278,7 @@
             }
             
             // Copy over the update FIDs - our widget will automatically update with changes
-            for (var key in msg.Fields) {
+            for (let key in msg.Fields) {
                 if (msg.Fields.hasOwnProperty(key))
                     this.widget[key] = msg.Fields[key];
             }
