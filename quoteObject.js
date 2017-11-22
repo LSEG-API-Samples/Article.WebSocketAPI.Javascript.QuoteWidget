@@ -3,11 +3,11 @@
 // The QuoteWidget module is an Angular JS-based client utilizing Thomson Reuters Elektron WebSocket API to
 // request and retrieve realtime market data.  The widget provides a interface that is geared towards the 
 // display of Equity-based instruments showing updates such as trades and quotes in realtime.  In addition, 
-// the widget utlizes Angular JS animation to provide a visual clue when individual fields are updated.
+// the widget utlizes Angular JS animation to provide visual feedback when individual fields are updated.
 //
 // Author:  Nick Zincone
 // Version: 1.0
-// Date:    October 2017.
+// Date:    November 2017.
 // ********************************************************************************************************
 
 // App
@@ -27,29 +27,20 @@
             appId: '256',
             position: '127.0.0.1',
         },
-        wsService: 'ELEKTRON_EDGE',     // Elektron WebSocket service hosting realtime market data    
+        //wsService: 'ELEKTRON_EDGE',   // Optional. Elektron WebSocket service hosting realtime market data    
         wsInitialRic: 'TRI.N',
-        streaming: true                 // We should always be streaming, but for testing we can change
     });
     
     // ****************************************************************
     // Custom filters used when displaying data in our widget
     // ****************************************************************
-    
-    // substr
-    // Enable the manipulation of strings using the native substr() functionality.
-    app.filter('substr', function() {
-        return( function(input, start, len) {
-            if ( input ) return(input.substr(start,len));
-        });
-    });
 
-    // trDate
-    // Filters a TR date field from: [dd mmm yyyy] to [ddmmmyy].
-    // Eg: 06 JUN 2017 ==> 06JUN17
-    app.filter('trDate', function() {
-        return( function(input) {
-            if ( input ) return(input.substr(0,2) + input.substr(3,3) + input.substr(9,2));
+    // toDate
+    // Filters a TR ISO 8601 date field from: [yyyy-mm-dd} to a javascript date.
+    // Useful when applying built-in angular filters.
+    app.filter('toDate', () => {
+        return( input => {
+            if ( input ) return( new Date(input) );
         });
     });
 
@@ -59,7 +50,7 @@
     // widgetStatus - Capture the status messages generated from the Elektron WebSocket server
     //                and display as a pull-down list to see history.
     //******************************************************************************************
-    app.factory('widgetStatus', function ($timeout) {
+    app.factory('widgetStatus', $timeout => {
         let statusList = [];
 
         return ({
@@ -72,9 +63,7 @@
                         statusList[0].id = 1;
 
                     // Force the callback to always run asynchronously - prevents error:inprog (Already in Progress) error
-                    $timeout(function() {
-                        statusList.unshift({ id: 0, msg: txt });
-                    }, 0);
+                    $timeout(() => {statusList.unshift({ id: 0, msg: txt })}, 0);
                 }
             }
         });
@@ -85,26 +74,21 @@
     //
     // animateOnChange - Directive to show change in our view.
     //**********************************************************************************************
-    app.directive('animateOnChange', function ($animate)
-    {
-        return (function (scope, elem, attr) {
-            scope.$watch(attr.animateOnChange, function(newVal,oldVal)
-            {
+    app.directive('animateOnChange', $animate => {
+        return ((scope, elem, attr) => {
+            scope.$watch(attr.animateOnChange, (newVal, oldVal) => {
                 if (newVal != oldVal) {
-                    $animate.enter(elem, elem.parent(), elem, function () {
-                        $animate.leave(elem);
-                    });
+                    $animate.enter(elem, elem.parent(), elem, () => $animate.leave(elem));
                 }
             })
         });
     });
 
     // Widget Controller
-    // This controller manages all interaction, behavior and display within our application.
+    // The AngularJS controller manages all interaction, behavior and display within our application.
     app.controller('widgetController', function ($scope, $rootScope, widgetStatus, config )
     {
         // Some initialization
-        let self = this;
         $scope.statusList = widgetStatus.list();
         this.requestedRic = config.wsInitialRic;       
         this.Ric = "";
@@ -123,35 +107,43 @@
         }
         
         //*******************************************************************************
-        // TRQuoteController.onStatus
+        // TRWebSocketController.onStatus
         //
-        // Capture all TRQuoteController status messages.
+        // Capture all TRWebSocketController status messages.
         //*******************************************************************************        
-        this.quoteController.onStatus(function(eventCode, msg) {
+        this.quoteController.onStatus((eventCode, msg) => {
+            let status = this.quoteController.status;
+            
             switch (eventCode) {                    
-                case this.status.connected:
-                    // TRQuoteController first reports success then will automatically attempt to log in to the TR WebSocket server...
+                case status.connected:
+                    // TRWebSocketController first reports success then will automatically 
+                    // attempt to log in to the TR WebSocket server...
                     widgetStatus.update("Connection to server is UP.");
-                    widgetStatus.update("Login request with user: [" + config.wsLogin.user + "]");
+                    widgetStatus.update(`Login request with user: [${config.wsLogin.user}]`);
                     break;
                     
-                case this.status.disconnected:
+                case status.disconnected:
                     widgetStatus.update("Connection to server is Down/Unavailable");
                     break;
                     
-                case this.status.loginResponse:
-                    self.processLogin(msg);
+                case status.loginResponse:
+                    this.processLogin(msg);
                     break;
                     
-                case this.status.msgStatus:
+                case status.msgStatus:
                     // Report potential issues with our requested market data item
-                    self.error = (msg.Key ? msg.Key.Name+":" : "");
-                    self.error += msg.State.Text;
-                    widgetStatus.update("Status response for item: " + self.error);                
+                    this.error = (msg.Key ? msg.Key.Name+":" : "");
+                    this.error += msg.State.Text;
+                    widgetStatus.update("Status response for item: " + this.error);                
                     break;
                     
-                case this.status.processingError:
-                    // Report any general controller issues
+                case status.msgError:
+                    // Report invalid usage errors
+                    widgetStatus.update(`Invalid usage: ${msg.Text}. ${msg.Debug.Message}`);
+                    break;
+                    
+                case status.processingError:
+                    // Report any general application-specific issues
                     widgetStatus.update(msg);
                     break;
             }
@@ -159,19 +151,12 @@
         
         //*********************************************************************************
         // processLogin
-        // Determine if we have successfully logged into our WebSocket server.  Within
-        // our Login response, we need to check the following stanza:
         //
-        // "State": {
-        //     "Stream": <stream state>,    "Open" | "Closed"
-        //     "Data": <data state>,        "Ok" | "Suspect"
-        //     "Text": <reason>
-        //  }
-        //
-        // If we logged in, submit our initial marketPrice request to our quote controller.
+        // Determine if we have successfully logged into our WebSocket server.  If so, 
+        // submit our initial marketPrice request to our quote controller.
         //*********************************************************************************
         this.processLogin = function (msg) {
-            widgetStatus.update("Login state: " + msg.State.Stream + "/" + msg.State.Data + "/" + msg.State.Text);
+            widgetStatus.update(`Login state: ${msg.State.Stream}/${msg.State.Data}/${msg.State.Text}`);
 
             if (this.quoteController.loggedIn())
                 this.requestMarketPrice(this.requestedRic);  // Send off our initial MarketPrice request
@@ -190,7 +175,7 @@
         
         //*******************************************************************************************
         // closeRequest
-        //
+        // Close the current streaming request.
         //*******************************************************************************************   
         this.closeRequest = function(ric) {
             // Only CLOSE if we have something outstanding...
@@ -206,8 +191,8 @@
         //*******************************************************************************************   
         this.requestMarketPrice = function(item) {
             // Send request
-            this.quoteController.requestData(item, {Service: config.wsService, Streaming: config.streaming});
-            widgetStatus.update("MarketPrice request: [" + item + "]");
+            this.quoteController.requestData(item, {Service: config.wsService});
+            widgetStatus.update(`MarketPrice request: [${item}]`);
 
             // Close our current item we are watching.  We do this after to ensure there is no conflict with ID's.
             this.closeRequest(this.Ric);
@@ -215,56 +200,51 @@
             // Request becomes valid when we get a valid response
             this.validRequest = false;
             this.error = "";
+            
+            // Clean up data model
+            this.widget = {};
         };
 
         //********************************************************************************************
-        // TRQuoteController.onMarketData
-        // Capture all TRQuoteController market data messages.
-        // After requesting for market data, some form of response (or responses) will be delivered 
-        // from the Elektron WebSocket Server.  When a message arrives, we make a distinction based
-        // on the following:
+        // TRWebSocketController.onMarketData
         //
-        //  - Refresh: Initial image received after requesting data.  All fields are included.
-        //  - Update: Realtime update based on market conditions.  Only fields changed are included.
+        // All our market data messages are captured here.  The main goal is to populate our data 
+        // model.  This will trigger our view to update the display.
         //********************************************************************************************        
-        this.quoteController.onMarketData(function(msg) {
-            $scope.$apply( function() {			
+        this.quoteController.onMarketData(msg => {
+            $scope.$apply( () => {	           
 				if ( msg.Type === "Refresh")
-					self.processRefresh(msg);
+					this.processRefresh(msg);
 				else
-					self.processUpdate(msg);
+					this.processUpdate(msg);
+                
+                // Populate our data model
+                Object.assign(this.widget, msg.Fields);                
 				
 				// Processing of some FIDs common to both Refresh and Update
 				if ( msg.Type === "Refresh" || msg.UpdateType === "ClosingRun" ) {
 					// Trade Price (modified)
-					self.widget.TRDPRC_1 = (msg.Fields.TRDPRC_1 ? msg.Fields.TRDPRC_1 : msg.Fields.HST_CLOSE);
+					this.widget.TRDPRC_1 = (msg.Fields.TRDPRC_1 ? msg.Fields.TRDPRC_1 : msg.Fields.HST_CLOSE);
 
 					// Change indicators (modified)
-					self.widget.NETCHNG_1 = (msg.Fields.NETCHNG_1 ? msg.Fields.NETCHNG_1 : 0);
-					self.widget.PCTCHNG = (msg.Fields.PCTCHNG ? msg.Fields.PCTCHNG : 0);
-					self.widget.PriceTick = (msg.Fields.PRCTCK_1 ? msg.Fields.PRCTCK_1.charCodeAt(0) : '');                 
+					this.widget.NETCHNG_1 = (msg.Fields.NETCHNG_1 ? msg.Fields.NETCHNG_1 : 0);
+					this.widget.PCTCHNG = (msg.Fields.PCTCHNG ? msg.Fields.PCTCHNG : 0);
+					this.widget.PriceTick = (msg.Fields.PRCTCK_1 ? msg.Fields.PRCTCK_1.charCodeAt(0) : '');                 
 				}
 			});
         });
         
         //********************************************************************************************
         // processRefresh
-        // A refresh message contains the complete image of our market data item which contains all 
-        // the latest values at the time we requested.  It is here we fill out our widget form with
-        // the current data.
         //********************************************************************************************
         this.processRefresh = function (msg) {
             // Remember some details upon our initial image
             this.validRequest = true;
             this.Ric = msg.Key.Name;
-            this.widget = msg.Fields;          
         };       
 
         //********************************************************************************************
         // processUpdate
-        // An update message contains only those fields that have been changed due to market conditions
-        // such as a new trade or new offer.  Only those fields that have been updated will be
-        // updated in our display widget.
         //********************************************************************************************
         this.processUpdate = function (msg) {
             // Recent trades (ripple fields)
@@ -275,13 +255,7 @@
                 this.widget.TRDPRC_2 = this.widget.TRDPRC_1; 
                 
                 this.widget.PriceTick = (msg.Fields.PRCTCK_1 ? msg.Fields.PRCTCK_1.charCodeAt(0) : this.widgetPriceTick);
-            }
-            
-            // Copy over the update FIDs - our widget will automatically update with changes
-            for (let key in msg.Fields) {
-                if (msg.Fields.hasOwnProperty(key))
-                    this.widget[key] = msg.Fields[key];
-            }
+            }          
         };
     });
 })();

@@ -1,6 +1,5 @@
 
 # Real-time Quote Widget example
-Created by Platform Services GitHub tool on Wed Aug 16 2017
 
 ## Table of Content
 
@@ -15,7 +14,7 @@ Created by Platform Services GitHub tool on Wed Aug 16 2017
 ## <a id="overview"></a>Overview
 The Real-time quote widget is a lightweight web-based interface utilizing capabilities offered within the Thomson Reuters Elektron WebSocket API to deliver real-time market data quotes to the browser.  Utilizing popular web technologies such as Angular JS and Twitter Bootstrap, the widget displays a simple equity quote interface showing updates in real-time.  
 
-Details and concepts are explained in the [Building a Real-time Quote widget]() article published on the [Thomson Reuters Developer Community portal](https://developers.thomsonreuters.com).
+Details and concepts are explained in the [Building a Real-time Quote widget]() article published on the [Thomson Reuters Developer Community portal](https://developers.thomsonreuters.com).  In addition, for an overview of the WebSocket API, you can refer to the ***Webinar - Introduction to the new Elektron WebSocket API*** within the Developer Community portal. 
 
 ![image](images/quote.gif)
 
@@ -37,12 +36,14 @@ Software components used:
 
 ## <a id="package"></a>Package
 
-If you have access to an ADS that is enabled to deliver market data via the Elektron WebSocket API, you can attempt to run within your own setup and reference the source code that is [available within GitHub](https://github.com/TR-API-Samples/Article.WebSocketAPI.Javascript.QuoteWidget).
+The package includes the complete source code and necessary dependencies to execute.  You can contact your local Market Data team or Thomson Reuters representative to provide the necessary setup to connect and test.  Because the package includes the TRWebSocketController submodule, you will need to properly clone using:
+
+`git clone --recursive <URL of this package>`
 
 The application package includes the following:
 * **TRWebSocketController/TRWebSocketController.js**
 
-  The TRWebSocketController is a generic interface used to manage all communication to the Elektron WebSocket server.  This design was intentional allowing the use of any Javascript framework to implement the desired solution.  Although a number of frameworks were possible, in this implementation, we chose Angular JS to build our widget.
+  The TRWebSocketController is a generic interface used to manage all communication to the Elektron WebSocket server.
  
 * **quoteObject.html, quoteObject.js**
   
@@ -52,7 +53,7 @@ The application package includes the following:
   
   Supporting technologies: Angular JS, Bootstrap.
 
-To run the package, simply load up the **`quoteObject.html`** within your browser and follow the instructions.  You will need to provide the **server** information for your ADS.
+To run the package, simply load up the **`quoteObject.html`** within your browser and follow the instructions.  You will need to provide the **server** information for the TR WebSocket API server.
 
 ### <a id="contributing"></a>Contributing
 

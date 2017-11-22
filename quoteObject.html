@@ -2,7 +2,7 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"/>
     <title>Quote Widget</title>
-    <meta name="author" content="Nick Zincone"></>
+    <meta name="author" content="Nick Zincone">
 
     <!-- Publicly available styles -->
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
@@ -113,7 +113,7 @@ app.constant('config', {
   wsServer: '&lt;host:port&gt;',   // Address of our Elektron WebSocket server.  Eg: ads:15000
   ...
 
-  wsService: 'ELEKTRON_EDGE',   // Elektron WebSocket service hosting realtime market data 
+  //wsService: 'ELEKTRON_EDGE',   // Optional.  Elektron WebSocket service hosting realtime market data 
   ...       </pre>
         </div>
       
@@ -133,9 +133,9 @@ app.constant('config', {
                         </span>
                     </div>
                     <div class="col-xs-8" style="font-size:14px">
-                        <span title="SALTIM" class="change" animate-on-change="quote.widget.SALTIM">{{quote.widget.SALTIM | substr:0:8}}</span>
+                        <span title="SALTIM" class="change" animate-on-change="quote.widget.SALTIM">{{quote.widget.SALTIM}}</span>
                         <span class="wlabel"> - </span>
-                        <span title="TRADE_DATE">{{quote.widget.TRADE_DATE | trDate}}</span>
+                        <span title="TRADE_DATE">{{quote.widget.TRADE_DATE | toDate | date:'ddMMMyy':'Z' | uppercase}}</span>
                     </div>
                 </div>
                 
@@ -159,7 +159,7 @@ app.constant('config', {
                     <div class="col-xs-2">
                         <span title="HST_CLOSE">{{quote.widget.HST_CLOSE | number:3}}</span>
                         <span class="wlabel"> - </span>                        
-                        <span title="HSTCLSDATE">{{quote.widget.HSTCLSDATE | trDate}}</span>
+                        <span title="HSTCLSDATE">{{quote.widget.HSTCLSDATE | toDate | date:'ddMMMyy':'Z' | uppercase}}</span>
                     </div>                      
                 </div>
 
@@ -199,9 +199,9 @@ app.constant('config', {
                     </div> 
                     <div class="col-xs-2 wlabel"></div>
                     <div class="col-xs-2 change">
-                        <span title="YRLOWDAT" animate-on-change="quote.widget.yearLowDate">{{quote.widget.YRLOWDAT | trDate}}</span>
+                        <span title="YRLOWDAT" animate-on-change="quote.widget.yearLowDate">{{quote.widget.YRLOWDAT | toDate | date:'ddMMMyy':'Z' | uppercase}}</span>
                         <span class="wlabel"> - </span>
-                        <span title="YRHIGHDAT" animate-on-change="quote.widget.yearHighDate">{{quote.widget.YRHIGHDAT | trDate}}</span>
+                        <span title="YRHIGHDAT" animate-on-change="quote.widget.yearHighDate">{{quote.widget.YRHIGHDAT | toDate | date:'ddMMMyy':'Z' | uppercase}}</span>
                     </div>  
                     <div class="col-xs-1 wlabel">P/E</div>
                     <div title="PERATIO" class="col-xs-2">{{quote.widget.PERATIO | number:3}}</div>                         
