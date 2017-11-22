@@ -212,26 +212,26 @@
         // model.  This will trigger our view to update the display.
         //********************************************************************************************        
         this.quoteController.onMarketData(msg => {
-            $scope.$apply( () => {	           
-				if ( msg.Type === "Refresh")
-					this.processRefresh(msg);
-				else
-					this.processUpdate(msg);
+            $scope.$apply( () => {             
+                if ( msg.Type === "Refresh")
+                    this.processRefresh(msg);
+                else
+                    this.processUpdate(msg);
                 
                 // Populate our data model
                 Object.assign(this.widget, msg.Fields);                
-				
-				// Processing of some FIDs common to both Refresh and Update
-				if ( msg.Type === "Refresh" || msg.UpdateType === "ClosingRun" ) {
-					// Trade Price (modified)
-					this.widget.TRDPRC_1 = (msg.Fields.TRDPRC_1 ? msg.Fields.TRDPRC_1 : msg.Fields.HST_CLOSE);
+                
+                // Processing of some FIDs common to both Refresh and Update
+                if ( msg.Type === "Refresh" || msg.UpdateType === "ClosingRun" ) {
+                    // Trade Price (modified)
+                    this.widget.TRDPRC_1 = (msg.Fields.TRDPRC_1 ? msg.Fields.TRDPRC_1 : msg.Fields.HST_CLOSE);
 
-					// Change indicators (modified)
-					this.widget.NETCHNG_1 = (msg.Fields.NETCHNG_1 ? msg.Fields.NETCHNG_1 : 0);
-					this.widget.PCTCHNG = (msg.Fields.PCTCHNG ? msg.Fields.PCTCHNG : 0);
-					this.widget.PriceTick = (msg.Fields.PRCTCK_1 ? msg.Fields.PRCTCK_1.charCodeAt(0) : '');                 
-				}
-			});
+                    // Change indicators (modified)
+                    this.widget.NETCHNG_1 = (msg.Fields.NETCHNG_1 ? msg.Fields.NETCHNG_1 : 0);
+                    this.widget.PCTCHNG = (msg.Fields.PCTCHNG ? msg.Fields.PCTCHNG : 0);
+                    this.widget.PriceTick = (msg.Fields.PRCTCK_1 ? msg.Fields.PRCTCK_1.charCodeAt(0) : '');                 
+                }
+            });
         });
         
         //********************************************************************************************
