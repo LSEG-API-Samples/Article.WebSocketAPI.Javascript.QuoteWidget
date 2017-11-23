@@ -30,19 +30,6 @@
         //wsService: 'ELEKTRON_EDGE',   // Optional. Elektron WebSocket service hosting realtime market data    
         wsInitialRic: 'TRI.N',
     });
-    
-    // ****************************************************************
-    // Custom filters used when displaying data in our widget
-    // ****************************************************************
-
-    // toDate
-    // Filters a TR ISO 8601 date field from: [yyyy-mm-dd} to a javascript date.
-    // Useful when applying built-in angular filters.
-    app.filter('toDate', () => {
-        return( input => {
-            if ( input ) return( new Date(input) );
-        });
-    });
 
     //******************************************************************************************
     // Sharable Services
