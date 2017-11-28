@@ -14,7 +14,7 @@
 ## <a id="overview"></a>Overview
 The Real-time quote widget is a lightweight web-based interface utilizing capabilities offered within the Thomson Reuters Elektron WebSocket API to deliver real-time market data quotes to the browser.  Utilizing popular web technologies such as Angular JS and Twitter Bootstrap, the widget displays a simple equity quote interface showing updates in real-time.  
 
-Details and concepts are explained in the [Building a Real-time Quote widget]() article published on the [Thomson Reuters Developer Community portal](https://developers.thomsonreuters.com).  In addition, for an overview of the WebSocket API, you can refer to the ***Webinar - Introduction to the new Elektron WebSocket API*** within the Developer Community portal. 
+Details and concepts are explained in the [Building a Real-time Quote widget](https://developers.thomsonreuters.com/article/building-real-time-quote-widget) article published on the [Thomson Reuters Developer Community portal](https://developers.thomsonreuters.com).  In addition, for an overview of the WebSocket API, you can refer to the ***Webinar - Introduction to the new Elektron WebSocket API*** within the Developer Community portal. 
 
 ![image](images/quote.gif)
 
@@ -23,7 +23,7 @@ For any question related to this article please use the Developer Community [Q&A
 ***Note:** To be able to ask questions and to benefit from the full content available on the [TR Developer Community portal](https://developers.thomsonreuters.com) we recommend you to [register here]( https://developers.thomsonreuters.com/iam/register) or [login here]( https://developers.thomsonreuters.com/iam/login?destination_path=Lw%3D%3D).*
 
 ## <a id="disclaimer"></a>Disclaimer
-The source code presented in this project has been written by Thomson Reuters only for the purpose of illustrating the concepts of building a simple real-time quote widget.  It has not been tested for a usage in production environments.
+TheÂ source code presented in this project has been written by Thomson Reuters only for the purpose of illustrating the concepts of building a simple real-time quote widget.  It has not been tested for a usage in production environments.
 
 ## <a id="prerequisites"></a>Prerequisites
 
