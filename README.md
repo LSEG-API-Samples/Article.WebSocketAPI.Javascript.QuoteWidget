@@ -34,7 +34,8 @@ Software components used:
 * [Bootstrap](http://getbootstrap.com/css/) (v3.3.7) - CSS templates providing useful styles for our display.
 * Access to the Thomson Reuters Advanced Distribution Server (ADS) version 3 with an enabled WebSocket service. 
 
-Browser support: Any browser that supports the [ES2015 specification](https://en.wikipedia.org/wiki/ECMAScript#6th_Edition_-_ECMAScript_2015).
+Browser support: 
+* Any browser that supports the [ES2015 specification](https://en.wikipedia.org/wiki/ECMAScript#6th_Edition_-_ECMAScript_2015).
 
 ## <a id="package"></a>Package
 
