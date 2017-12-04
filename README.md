@@ -35,7 +35,7 @@ Software components used:
 * Access to the Thomson Reuters Advanced Distribution Server (ADS) version 3 with an enabled WebSocket service. 
 
 Browser support: 
-* Any browser that supports the [ES2015 specification](https://en.wikipedia.org/wiki/ECMAScript#6th_Edition_-_ECMAScript_2015).
+* [Any browser](https://kangax.github.io/compat-table/es6/) that supports the [ES2015 specification](https://en.wikipedia.org/wiki/ECMAScript#6th_Edition_-_ECMAScript_2015).
 
 ## <a id="package"></a>Package
 
