@@ -21,7 +21,7 @@
     
     // Configuration
     app.constant('config', {
-        wsServer: '<host:port>',        // Address of our Elektron WebSocket server.  Eg: ads:15000
+        wsServer: 'host:port',          // Address of our Elektron WebSocket server.  Eg: ads:15000
         wsLogin: {                      // Elektron WebSocket login credentials
             user: 'user',
             appId: '256',
@@ -82,7 +82,7 @@
         this.validRequest = false;
         this.error = "";
         this.widget = {};
-        this.needsConfiguration = (config.wsServer === '<host:port>');
+        this.needsConfiguration = (config.wsServer === 'host:port');
         
         // Our Elektron WebSocket interface
         this.quoteController = new TRWebSocketController();
