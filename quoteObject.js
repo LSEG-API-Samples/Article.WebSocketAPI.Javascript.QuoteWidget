@@ -1,14 +1,23 @@
-// ********************************************************************************************************
+// **********************************************************************************************************
 // QuoteWidget.js
-// The QuoteWidget module is an Angular JS-based client utilizing Thomson Reuters Elektron WebSocket API to
-// request and retrieve realtime market data.  The widget provides a interface that is geared towards the 
-// display of Equity-based instruments showing updates such as trades and quotes in realtime.  In addition, 
-// the widget utlizes Angular JS animation to provide visual feedback when individual fields are updated.
+// The QuoteWidget module is an Angular JS-based client application utilizing streaming services provided 
+// by Elektron RealTime (ERT) streaming services to request and retrieve realtime market data.  The interface 
+// provides the ability to connect to the streaming services via the TREP (ADS) local installation
+// or via the ERT (Elektron Real Time) in the Cloud.   
 //
-// Author:  Nick Zincone
-// Version: 1.0
-// Date:    November 2017.
-// ********************************************************************************************************
+// The widget provides an interface that is geared towards the display of Equity-based instruments showing 
+// updates such as trades and quotes in realtime.  In addition, the widget utlizes Angular JS animation to 
+// provide visual feedback when individual fields are updated.
+//
+// Note: When requesting for streaming services from EDP/ERT, applications must be authenticated using 
+//       the HTTP EDP authentication services prior to connecting into the ERT services over WebSockets. 
+//       To adhere to the "Same Origin" security policies, a simple server-side application (provided) 
+//       will act as an application proxy managing EDP authentication.  Refer to the instructions for setup.       
+//
+// Authors: Nick Zincone, Wasin Waeosri
+// Version: 2.0
+// Date:    October 2018.
+// **********************************************************************************************************
 
 // App
 // Main Application entry point.  Perform app-specific intialization within our closure
@@ -19,17 +28,49 @@
     // feedback when a field is updated in realtime.
     let app = angular.module('QuoteWidget',['ngAnimate']);
     
-    // Configuration
+    // Application session configuration
+    // Define the session (TREP, EDP/ERT) you wish to use to access streaming services.  To define your session,
+    // Uncomment the line below:
+    //      session: undefined
+    //
+    // Eg:  session: 'EDP'     // EDP/ERT Session
+    //      session: 'ADS'     // TREP/ADS Session
     app.constant('config', {
-        wsServer: 'host:port',          // Address of our Elektron WebSocket server.  Eg: ads:15000
-        wsLogin: {                      // Elektron WebSocket login credentials
-            user: 'user',
-            appId: '256',
-            position: '127.0.0.1',
+        session: undefined,         // 'ADS' or 'EDP'.
+        
+        // TREP (ADS) session.
+        // This section defines the connection and authentication requirements to connect directly into the 
+        // streaming services from your locally installed TREP installation.
+        // Load this example directly within your browswer.
+        adsSession: {
+            wsServer: 'ewa',               // Address of our ADS Elektron WebSocket server.  Eg: 'elektron'
+            wsPort: '15000',               // Address port of our ADS Elektron Websccket server. Eg: 15000
+            wsLogin: {                     // Elektron WebSocket login credentials
+                user: 'user',              // User name.  Optional.  Default: desktop login.
+                appId: '256',              // AppID. Optional.  Default: '256'
+                position: '127.0.0.1',     // Position.  Optional. Default: '127.0.0.1'
+            }
+            //wsService: 'ELEKTRON_EDGE',   // Optional. Elektron WebSocket service hosting realtime market data              
         },
-        //wsService: 'ELEKTRON_EDGE',   // Optional. Elektron WebSocket service hosting realtime market data    
-        wsInitialRic: 'TRI.N',
-    });
+        
+        // ERT (Elektron Real Time) in Cloud session.
+        // This section defines authenticastion to access EDP (Elektron Data Platform)/ERT.
+        // Start the local HTTP server (provided) and within your browser, specify the URL: http://localhost:8080/quoteObject.html
+        edpSession: {
+            wsLogin: {
+                user: undefined,
+                password: undefined,
+                clientId: undefined
+            },
+            //wsService: 'ELEKTRON_EDGE',   // Optional. Elektron WebSocket service hosting realtime market data
+            restAuthHostName: 'https://api.edp.thomsonreuters.com/auth/oauth2/beta1/token',
+            restServiceDiscovery: 'https://api.edp.thomsonreuters.com/streaming/pricing/v1/',
+            wsLocation: 'us-east-1a',
+            wstransport: 'websocket',
+            wsdataformat: 'tr_json2'
+        },  
+        wsInitialRic: 'AAPL.O'
+    });    
 
     //******************************************************************************************
     // Sharable Services
@@ -42,8 +83,8 @@
 
         return ({
             list: function () { return (statusList); },
-            update: function (txt) {
-                console.log(txt);
+            update: function (txt,msg) {
+                console.log(txt,msg);
                 let status = statusList[0];
                 if (!status || status.msg != txt) {
                     if (status)
@@ -82,35 +123,83 @@
         this.validRequest = false;
         this.error = "";
         this.widget = {};
-        this.needsConfiguration = (config.wsServer === 'host:port');
+        this.needsConfiguration = (config.session === undefined);
         
-        // Our Elektron WebSocket interface
-        this.quoteController = new TRWebSocketController();
+        // Define the WebSocket interface to manage our streaming services
+        this.ertController = new ERTWebSocketController();
+        
+        // EDP Authentication
+        // Only applicable if a user chooses an ERT Session.
+        this.edpController = new ERTRESTController();
        
-        // Connect into our realtime server
-        if ( !this.needsConfiguration ) {
-            widgetStatus.update("Connecting to the WebSocket service on [host:port] " + config.wsServer + "...");
-            this.quoteController.connect(config.wsServer, config.wsLogin.user, config.wsLogin.appId, config.wsLogin.position);           
+        // Initialize our session
+        switch (config.session) {
+            case 'ADS':
+                widgetStatus.update("Connecting to the WebSocket streaming service on ["+ config.adsSession.wsServer + ":" + config.adsSession.wsPort + "]");
+                this.ertController.connectADS(config.adsSession.wsServer, config.adsSession.wsPort, config.adsSession.wsLogin.user, 
+                                                config.adsSession.wsLogin.appId, config.adsSession.wsLogin.position);
+                break;
+            case 'EDP':
+                widgetStatus.update("Authenticating with EDP using " + config.edpSession.restAuthHostName + "...");
+                this.edpController.get_access_token({
+                    'username': config.edpSession.wsLogin.user,
+                    'password': config.edpSession.wsLogin.password,
+                    'clientId': config.edpSession.wsLogin.clientId
+                });            
+                break;
         }
+
+        //***********************************************************************************
+        // ERTRESTController.onStatus
+        //
+        // Capture all ERTRESTController status messages.
+        // EDP/ERT uses OAuth 2.0 authentication and requires clients to use access tokens to 
+        // retrieve streaming content.  In addition, EDP/ERT requires clients to continuously 
+        // refresh the access token to continue uninterrupted service.  
+        //
+        // The following callback will capture the events related to retrieving and 
+        // continuously updating the tokens in order to provide the streaming interface these
+        // details to maintain uninterrupted service. 
+        //***********************************************************************************
+        this.edpController.onStatus((eventCode, msg) => {
+            let status = this.edpController.status;
+
+            switch (eventCode) {
+                case status.getRefreshToken: // Get Access token form EDP (re-refresh Token case)
+                    this.auth_obj = msg;
+                    widgetStatus.update("EDP Authentication Refresh success.  Refreshing ERT stream...");                    
+                    this.ertController.refreshERT(msg);
+                    break;
+                case status.getService: // Get Service Discovery information form EDP
+                    // Connect into ERT in Cloud Elektron WebSocket server
+                    this.ertController.connectERT(msg.hostList, msg.portList, msg.access_token, config.edpSession.appId, config.edpSession.position);
+                    break;
+                case status.authenError: // Get Authentication fail error form EDP
+                    widgetStatus.update("Elektron Real Time in Cloud authentication failed.  See console.", msg);                    
+                    break;
+                case status.getServiceError: // Get Service Discovery fail error form EDP
+                    widgetStatus.update("Elektron Real Time in Cloud Service Discovery failed.  See console.", msg);
+                    break;
+            }
+        });        
         
         //*******************************************************************************
-        // TRWebSocketController.onStatus
+        // ERTWebSocketController.onStatus
         //
-        // Capture all TRWebSocketController status messages.
+        // Capture all ERTWebSocketController status messages.
         //*******************************************************************************        
-        this.quoteController.onStatus((eventCode, msg) => {
-            let status = this.quoteController.status;
+        this.ertController.onStatus((eventCode, msg) => {
+            let status = this.ertController.status;
             
             switch (eventCode) {                    
                 case status.connected:
-                    // TRWebSocketController first reports success then will automatically 
+                    // ERTWebSocketController first reports success then will automatically 
                     // attempt to log in to the TR WebSocket server...
-                    widgetStatus.update("Connection to server is UP.");
-                    widgetStatus.update(`Login request with user: [${config.wsLogin.user}]`);
+                    console.log(`Successfully connected into the ERT WebSocket server: ${msg.server}:${msg.port}`);                    
                     break;
                     
                 case status.disconnected:
-                    widgetStatus.update("Connection to server is Down/Unavailable");
+                    widgetStatus.update(`Connection to ERT streaming server: ${msg.server}:${msg.port} is down/unavailable`);
                     break;
                     
                 case status.loginResponse:
@@ -129,6 +218,14 @@
                     widgetStatus.update(`Invalid usage: ${msg.Text}. ${msg.Debug.Message}`);
                     break;
                     
+                case status.tokenExpire:
+                    widgetStatus.update("Elektron Data Platform Authentication Expired");
+                    break;
+
+                case status.refreshSuccess:
+                    widgetStatus.update("Elektron Data Platform Authentication Refresh success")
+                    break;                    
+                    
                 case status.processingError:
                     // Report any general application-specific issues
                     widgetStatus.update(msg);
@@ -145,7 +242,7 @@
         this.processLogin = function (msg) {
             widgetStatus.update(`Login state: ${msg.State.Stream}/${msg.State.Data}/${msg.State.Text}`);
 
-            if (this.quoteController.loggedIn())
+            if (this.ertController.loggedIn())
                 this.requestMarketPrice(this.requestedRic);  // Send off our initial MarketPrice request
         }; 
 
@@ -167,7 +264,7 @@
         this.closeRequest = function(ric) {
             // Only CLOSE if we have something outstanding...
             if ( this.validRequest )
-                this.quoteController.closeRequest(ric);
+                this.ertController.closeRequest(ric);
         };
         
         //*******************************************************************************************
@@ -178,7 +275,7 @@
         //*******************************************************************************************   
         this.requestMarketPrice = function(item) {
             // Send request
-            this.quoteController.requestData(item, {Service: config.wsService});
+            this.ertController.requestData(item, {Service: config.wsService});
             widgetStatus.update(`MarketPrice request: [${item}]`);
 
             // Close our current item we are watching.  We do this after to ensure there is no conflict with ID's.
@@ -193,12 +290,12 @@
         };
 
         //********************************************************************************************
-        // TRWebSocketController.onMarketData
+        // ERTWebSocketController.onMarketData
         //
         // All our market data messages are captured here.  The main goal is to populate our data 
         // model.  This will trigger our view to update the display.
         //********************************************************************************************        
-        this.quoteController.onMarketData(msg => {
+        this.ertController.onMarketData(msg => {
             $scope.$apply( () => {             
                 if ( msg.Type === "Refresh")
                     this.processRefresh(msg);

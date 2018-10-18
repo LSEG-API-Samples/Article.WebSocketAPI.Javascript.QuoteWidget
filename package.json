@@ -1,0 +1,26 @@
+{
+  "name": "edpAuthentication_server",
+  "version": "1.0.0",
+  "description": "Server managing REST interface to EDP Authentication",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TR-API-Samples/Article.WebSocketAPI.Javascript.QuoteWidget.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TR-API-Samples/Article.WebSocketAPI.Javascript.QuoteWidget/issues"
+  },
+  "homepage": "https://github.com/TR-API-Samples/Article.WebSocketAPI.Javascript.QuoteWidget#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.2"
+  }
+}

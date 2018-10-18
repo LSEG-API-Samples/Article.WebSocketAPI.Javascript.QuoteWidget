@@ -12,7 +12,8 @@
     <script type="text/javascript" src="js/angular-animate.min.js"></script>
 
     <!-- Application-specific javascript interface and logic -->
-    <script type="text/javascript" src="TRWebSocketController/TRWebSocketController.js"></script>
+    <script type="text/javascript" src="ERTController/ERTWebSocketController.js"></script>
+    <script type="text/javascript" src="ERTController/ERTRESTController.js"></script>    
     <script type="text/javascript" src="QuoteObject.js"></script>
 
     <style>
@@ -81,10 +82,10 @@
 
 <body ng-controller="widgetController as quote">
     <div class="page-header">
-        <h3>Elektron Websocket API - Quote Widget</h3>
+        <h3>EDP/ERT API - Quote Widget</h3>
     </div>
  
-    <div class="container" style="width:800px;height:200px; font-size:12px; color:white;background:#303030; border:2px solid orange;">
+    <div class="container" style="width:800px;height:225px; font-size:12px; color:white;background:#303030; border:2px solid orange;">
         <div class="row vertical-align" style="background:#202020;height: 50px;">
             <div class="col-md-3" style="font-size:24px">Equity Quote</div>
             <div class="col-md-2">
@@ -107,14 +108,16 @@
         
         <div ng-show=quote.needsConfiguration>
             Before using this widget, the following configuration is required within the 'quoteObject.js' file.
-            Modify the following sections:
+            Define the session and authentication properties within the following section:
             <pre style="font-size:10px;color:yellow;background-color:#303030; border:none">
-app.constant('config', {
-  wsServer: 'host:port',   // Address of our Elektron WebSocket server.  Eg: ads:15000
-  ...
-
-  //wsService: 'ELEKTRON_EDGE',   // Optional.  Elektron WebSocket service hosting realtime market data 
-  ...       </pre>
+// Application session configuration
+// Define the session (TREP, EDP/ERT) you wish to use to access streaming services.  To define your session,
+// Uncomment the line below:
+//      session: undefined
+//
+// Eg:  session: 'EDP'     // EDP/ERT Session
+//      session: 'ADS'     // TREP/ADS Session
+            </pre>
         </div>
       
         <div ng-show=quote.validRequest>
