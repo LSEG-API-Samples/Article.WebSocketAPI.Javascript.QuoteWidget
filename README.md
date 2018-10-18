@@ -106,7 +106,7 @@ To run the widget, simply load the file within your browser.
 
 Connecting into the cloud from your browser will require the JavaScript to run within a local proxy.  The browser enforces the [***Same-origin***](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy) policy which is a critical security mechanism to reduce malicious attacks.  
 
-To setup your environment to run the EDT/ERT examples, perform the following steps:
+To setup your environment to access ERT in the cloud, perform the following steps:
 
 1. Within the installation directory, install [Node.js](https://nodejs.org/en/) modules by executing the following.  
 
