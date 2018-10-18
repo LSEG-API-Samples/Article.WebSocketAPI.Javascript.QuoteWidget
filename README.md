@@ -100,6 +100,8 @@ adsSession: {
 },
 ```
 
+To run the widget, simply load the file within your browser.
+
 ### EDP/ERT
 
 Connecting into the cloud from your browser will require the JavaScript to run within a local proxy.  The browser enforces the [***Same-origin***](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy) policy which is a critical security mechanism to reduce malicious attacks.  
