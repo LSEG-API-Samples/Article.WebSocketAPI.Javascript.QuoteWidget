@@ -30,7 +30,7 @@
     
     // Application session configuration
     // Define the session (TREP, EDP/ERT) you wish to use to access streaming services.  To define your session,
-    // Uncomment the line below:
+    // update the following setting:
     //      session: undefined
     //
     // Eg:  session: 'EDP'     // EDP/ERT Session

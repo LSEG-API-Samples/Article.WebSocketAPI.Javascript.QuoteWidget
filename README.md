@@ -65,7 +65,7 @@ Within *quoteObject.js* file, choose your session:
 ```javascript
 // Application session configuration
 // Define the session (TREP, EDP/ERT) you wish to use to access streaming services.  
-// To define your session, uncomment the line below:
+// To define your session, update the following setting:
 //      session: undefined
 //
 // Eg:  session: 'EDP'     // EDP/ERT Session
