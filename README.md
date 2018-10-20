@@ -18,7 +18,7 @@ Details and concepts are explained in the [Building a Real-time Quote widget](ht
 
 For any question related to this article please use the Developer Community [Q&A Forum](https://community.developers.thomsonreuters.com).
 
-***Note:** To be able to ask questions and to benefit from the full content available on the [TR Developer Community portal](https://developers.thomsonreuters.com) we recommend you to [register here]( https://developers.thomsonreuters.com/iam/register) or [login here]( https://developers.thomsonreuters.com/iam/login?destination_path=Lw%3D%3D).*
+***Note:** To be able to ask questions and to benefit from the full content available on the [Developer Community portal](https://developers.thomsonreuters.com) we recommend you to [register here]( https://developers.thomsonreuters.com/iam/register) or [login here]( https://developers.thomsonreuters.com/iam/login?destination_path=Lw%3D%3D).*
 
 ## <a id="disclaimer"></a>Disclaimer
 The source code presented in this project has been written by Refinitiv only for the purpose of illustrating the concepts of building a simple real-time quote widget.  It has not been tested for a usage in production environments.
@@ -27,7 +27,7 @@ The source code presented in this project has been written by Refinitiv only fo
 
 Software components used:
 
-* [Elektron WebSocket API](https://developers.thomsonreuters.com/elektron/websocket-api-early-access) - Thomson Reuters interface to access Elektron real-time market data.
+* [Elektron WebSocket API](https://developers.thomsonreuters.com/elektron/websocket-api-early-access) -  Interface to access Elektron real-time market data.
 * [Angular JS](https://angularjs.org/) (v1.6.5)- Googles Client-side JavaScript framework to build rich HTML applications.  Not only provides an easy and intuitive capability to binding our content within our pages but also animated visual feedback of real-time updates.
 * [Bootstrap](http://getbootstrap.com/css/) (v3.3.7) - CSS templates providing useful styles for our display.
 * Access to ERT streaming services. 
@@ -163,7 +163,8 @@ Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c6
 
 ### <a id="authors"></a>Authors
 
-* **Nick Zincone** - Release 1.0.  *Initial version*
+* **Nick Zincone** - Release 1.0.  *Initial version* (TREP connectivity only)
+* **Nick Zincone** - Release 2.0.  Added connectivity into EDP/ERT in the cloud.
 
 ### <a id="license"></a>License
 
