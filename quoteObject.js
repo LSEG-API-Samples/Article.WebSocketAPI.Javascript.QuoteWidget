@@ -1,9 +1,9 @@
 // **********************************************************************************************************
 // QuoteWidget.js
 // The QuoteWidget module is an Angular JS-based client application utilizing streaming services provided 
-// by Elektron RealTime (ERT) streaming services to request and retrieve realtime market data.  The interface 
-// provides the ability to connect to the streaming services via the TREP (ADS) local installation
-// or via the ERT (Elektron Real Time) in the Cloud.   
+// by Elektron RealTime (ERT) to request and retrieve realtime market data.  The interface provides the 
+// ability to connect to the streaming services via the TREP (ADS) local installation or via the ERT 
+// (Elektron Real Time) in the Cloud.   
 //
 // The widget provides an interface that is geared towards the display of Equity-based instruments showing 
 // updates such as trades and quotes in realtime.  In addition, the widget utlizes Angular JS animation to 
@@ -194,7 +194,7 @@
             switch (eventCode) {                    
                 case status.connected:
                     // ERTWebSocketController first reports success then will automatically 
-                    // attempt to log in to the TR WebSocket server...
+                    // attempt to log in to the ERT WebSocket server...
                     console.log(`Successfully connected into the ERT WebSocket server: ${msg.server}:${msg.port}`);                    
                     break;
                     
