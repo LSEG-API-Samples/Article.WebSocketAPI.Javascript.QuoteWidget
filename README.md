@@ -76,7 +76,7 @@ app.constant('config', {
 
 Once you have specified your session, refer to the specific section below which outlines the steps required to setup and run this widget within the browser.
 
-**Note**: Accessing ERT streaming services within *Eikon* will be provided when services are released and supported within the Eikon desktop..
+**Note**: Accessing ERT streaming services within *Eikon* will be provided when services are released and supported within the Eikon desktop.
 
 ### TREP/ADS
 
