@@ -12,7 +12,7 @@
 ## <a id="overview"></a>Overview
 The Real-time quote widget is a lightweight web-based interface utilizing capabilities offered within the Elektron RealTime (ERT) streaming services to deliver real-time market data quotes to the browser.  Utilizing popular web technologies such as Angular JS and Twitter Bootstrap, the widget displays a simple equity quote interface showing updates in real-time.  
 
-Details and concepts are explained in the [Building a Real-time Quote widget](https://developers.thomsonreuters.com/article/building-real-time-quote-widget) article published on the [Developer Community portal](https://developers.thomsonreuters.com).  In addition, for an overview of the WebSocket API, you can refer to the Webinar - [Integrating real-time content with the Elektron WebSocket API](https://developers.thomsonreuters.com/content/integrating-real-time-content-elektron-websocket-api) within the Developer Community portal. 
+Details and concepts are explained in the [How to build a Real-time streaming Quote widget](https://developers.thomsonreuters.com/article/building-real-time-quote-widget) article published on the [Developer Community portal](https://developers.thomsonreuters.com).  In addition, for an overview of the WebSocket API, you can refer to the Webinar - [Integrating real-time content with the Elektron WebSocket API](https://developers.thomsonreuters.com/content/integrating-real-time-content-elektron-websocket-api) within the Developer Community portal. 
 
 ![image](images/quote.gif)
 
