@@ -49,7 +49,7 @@
                 user: 'user',              // User name.  Optional.  Default: desktop login.
                 appId: '256',              // AppID. Optional.  Default: '256'
                 position: '127.0.0.1',     // Position.  Optional. Default: '127.0.0.1'
-            }
+            },
             //wsService: 'ELEKTRON_EDGE',   // Optional. Elektron WebSocket service hosting realtime market data              
         },
         
