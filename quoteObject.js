@@ -49,8 +49,7 @@
                 user: 'user',              // User name.  Optional.  Default: desktop login.
                 appId: '256',              // AppID. Optional.  Default: '256'
                 position: '127.0.0.1',     // Position.  Optional. Default: '127.0.0.1'
-            },
-            //wsService: 'ELEKTRON_EDGE',   // Optional. Elektron WebSocket service hosting realtime market data              
+            },       
         },
         
         // ERT (Elektron Real Time) in Cloud session.
@@ -62,13 +61,13 @@
                 password: undefined,
                 clientId: undefined
             },
-            //wsService: 'ELEKTRON_EDGE',   // Optional. Elektron WebSocket service hosting realtime market data
             restAuthHostName: 'https://api.edp.thomsonreuters.com/auth/oauth2/beta1/token',
             restServiceDiscovery: 'https://api.edp.thomsonreuters.com/streaming/pricing/v1/',
             wsLocation: 'us-east-1a',
             wstransport: 'websocket',
             wsdataformat: 'tr_json2'
         },  
+        //wsService: 'ELEKTRON_EDGE',   // Optional. Elektron WebSocket service hosting realtime market data
         wsInitialRic: 'AAPL.O'
     });    
 
