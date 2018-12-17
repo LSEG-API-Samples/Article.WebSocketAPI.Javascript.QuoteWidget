@@ -83,7 +83,7 @@
         return ({
             list: function () { return (statusList); },
             update: function (txt,msg) {
-                console.log(txt,msg);
+                (msg != null ? console.log(txt,msg) : console.log(txt));
                 let status = statusList[0];
                 if (!status || status.msg != txt) {
                     if (status)
