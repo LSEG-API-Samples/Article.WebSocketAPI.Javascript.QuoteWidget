@@ -94,9 +94,7 @@ adsSession: {
       user: 'user',              // User name.  Optional.  Default: desktop login.
       appId: '256',              // AppID. Optional.  Default: '256'
       position: '127.0.0.1',     // Position.  Optional. Default: '127.0.0.1'         
-   }
-   //wsService: 'ELEKTRON_EDGE',   // Optional. Elektron WebSocket service hosting 
-                                   // realtime market data              
+   }            
 },
 ```
 
@@ -144,9 +142,7 @@ To setup your environment to access ERT in the cloud, perform the following step
            user: undefined,
            password: undefined,
            clientId: undefined
-       },
-       //wsService: 'ELEKTRON_EDGE',   // Optional. Elektron WebSocket service hosting
-                                       // realtime market data 
+       }
    ```
 
 4. Load the widget within the browser using the following URL format:
