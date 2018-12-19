@@ -136,9 +136,9 @@
                         </span>
                     </div>
                     <div class="col-xs-8" style="font-size:14px">
-                        <span title="SALTIM" class="change" animate-on-change="quote.widget.SALTIM">{{quote.widget.SALTIM}}</span>
+                        <span title="TRDTIM_1" class="change" animate-on-change="quote.widget.TRDTIM_1">{{quote.widget.TRDTIM_1 | limitTo:5}}</span>
                         <span class="wlabel"> - </span>
-                        <span title="TRADE_DATE">{{quote.widget.TRADE_DATE | date:'ddMMMyy':'Z' | uppercase}}</span>
+                        <span title="TRADE_DATE">{{quote.widget.TRADE_DATE | date:'ddMMMyy' | uppercase}}</span>
                     </div>
                 </div>
                 
@@ -162,7 +162,7 @@
                     <div class="col-xs-2">
                         <span title="HST_CLOSE">{{quote.widget.HST_CLOSE | number:3}}</span>
                         <span class="wlabel"> - </span>                        
-                        <span title="HSTCLSDATE">{{quote.widget.HSTCLSDATE | date:'ddMMMyy':'Z' | uppercase}}</span>
+                        <span title="HSTCLSDATE">{{quote.widget.HSTCLSDATE | date:'ddMMMyy' | uppercase}}</span>
                     </div>                      
                 </div>
 
@@ -202,9 +202,9 @@
                     </div> 
                     <div class="col-xs-2 wlabel"></div>
                     <div class="col-xs-2 change">
-                        <span title="YRLOWDAT" animate-on-change="quote.widget.yearLowDate">{{quote.widget.YRLOWDAT | date:'ddMMMyy':'Z' | uppercase}}</span>
+                        <span title="YRLOWDAT" animate-on-change="quote.widget.yearLowDate">{{quote.widget.YRLOWDAT | date:'ddMMMyy' | uppercase}}</span>
                         <span class="wlabel"> - </span>
-                        <span title="YRHIGHDAT" animate-on-change="quote.widget.yearHighDate">{{quote.widget.YRHIGHDAT | date:'ddMMMyy':'Z' | uppercase}}</span>
+                        <span title="YRHIGHDAT" animate-on-change="quote.widget.yearHighDate">{{quote.widget.YRHIGHDAT | date:'ddMMMyy' | uppercase}}</span>
                     </div>  
                     <div class="col-xs-1 wlabel">P/E</div>
                     <div title="PERATIO" class="col-xs-2">{{quote.widget.PERATIO | number:3}}</div>                         
