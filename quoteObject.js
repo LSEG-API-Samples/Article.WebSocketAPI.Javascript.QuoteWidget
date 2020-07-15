@@ -61,8 +61,8 @@
                 password: undefined,
                 clientId: undefined
             },
-            restAuthHostName: 'https://api.edp.thomsonreuters.com/auth/oauth2/beta1/token',
-            restServiceDiscovery: 'https://api.edp.thomsonreuters.com/streaming/pricing/v1/',
+            restAuthHostName: 'https://api.refinitiv.com/auth/oauth2/v1/token',
+            restServiceDiscovery: 'https://api.refinitiv.com/streaming/pricing/v1/',
             wsLocation: 'us-east-1a',
             wstransport: 'websocket',
             wsdataformat: 'tr_json2'
