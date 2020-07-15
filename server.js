@@ -8,8 +8,8 @@ const app = express();
 const port = 8080;
 
 // EDP constant variables
-const auth_hostname = 'https://api.edp.thomsonreuters.com';
-const EDP_version = '/beta1';
+const auth_hostname = 'https://api.refinitiv.com';
+const EDP_version = '/v1';
 const auth_category_URL = '/auth/oauth2';
 const auth_endpoint_URL = '/token';
 const client_secret = '';
